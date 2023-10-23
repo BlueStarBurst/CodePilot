@@ -34,11 +34,11 @@ function createCopy() {
                 filename: 'index.html',
                 template: path.resolve(__dirname, './public/index.html'),
             }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    { from: 'assets' }
-                ]
-            })
+            // new CopyWebpackPlugin({
+            //     patterns: [
+            //         { from: 'assets' }
+            //     ]
+            // })
         ],
         experiments: {
             topLevelAwait: true
