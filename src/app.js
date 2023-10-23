@@ -13,4 +13,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 
 
-render(<h1>Hi</h1>, document.getElementById("root"));
+function TestClass(props) {
+	return (
+		<div className="test">
+			<h1>Test</h1>
+		</div>
+	)
+}
+
+render(<TestClass/>, document.getElementById("root"));
