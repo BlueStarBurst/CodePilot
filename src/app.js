@@ -14,9 +14,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 
 function TestClass(props) {
+	const [state, setState] = useState("Hello!");
+
+	useEffect(() => {
+		console.log("test");
+		setTimeout(() => {
+			setState("Hello World!");
+		}, 1000);
+	}, []);
+
 	return (
 		<div className="test">
-			<h1>Test</h1>
+			<h1>{state}</h1>
 		</div>
 	)
 }
