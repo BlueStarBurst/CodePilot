@@ -24,10 +24,12 @@ function TestClass(props) {
 	}, []);
 
 	return (
-		<div className="test">
+		<div className="flex-page">
 			<h1>{state}</h1>
 		</div>
 	)
 }
+
+
 
 render(<TestClass/>, document.getElementById("root"));
