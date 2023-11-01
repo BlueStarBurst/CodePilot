@@ -1,8 +1,15 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth, signInWithRedirect, GoogleAuthProvider } from "firebase/auth";
+import {
+	getAuth,
+	signInWithRedirect,
+	GoogleAuthProvider,
+	getRedirectResult,
+    signInWithPopup,
+} from "firebase/auth";
 import { useEffect, useState } from "react";
+// import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,54 +27,61 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+// const db = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
 var isLoaded = false;
 var isSignedIn = false;
 
-export function signInWithGoogle() {
-    if (isLoaded && isSignedIn) {
-        return;
-    }
-    const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
+export async function signInWithGoogle() {
+	if (isLoaded && isSignedIn) {
+		return;
+	}
+	const provider = new GoogleAuthProvider();
+	// get redirect result
+    // Before
+    // ==============
+    const result = await signInWithRedirect(auth, provider);
+    const credential = await getRedirectResult(auth);
+
+    console.log(credential);
+	// After
+	// ==============
+	// const userCred2 = await signInWithPopup(auth, provider);
 }
 
 export function isUserSignedIn() {
-    return isSignedIn;
+	return isSignedIn;
 }
 
 export function logOut() {
-    auth.signOut();
+	auth.signOut();
 }
 
 //on auth state change
 
-
-
 export const Auth = (props) => {
+	useEffect(() => {
+		if (!isLoaded && auth && auth.currentUser != null) {
+			isLoaded = true;
+		}
+		props.setAuthState(auth.currentUser);
+		console.log("auth state changed");
+		auth.onAuthStateChanged((user) => {
+			if (user) {
+				isSignedIn = true;
+				console.log("user signed in");
+			} else {
+				isSignedIn = false;
+				console.log("user signed out");
+			}
+			isLoaded = true;
+			props.setAuthState(user);
+		});
+	}, []);
 
-    useEffect(() => {
-        if (!isLoaded && auth && auth.currentUser != null) {
-            isLoaded = true;
-        }
-        props.setAuthState(auth.currentUser);
-        console.log("auth state changed");
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                isSignedIn = true;
-                console.log("user signed in");
-            } else {
-                isSignedIn = false;
-                console.log("user signed out");
-            }
-            isLoaded = true;
-            props.setAuthState(user);
-        });
-    }, []);
+	return null;
+};
 
-    return null;
-}
-
-export {auth};
+export { auth };

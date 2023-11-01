@@ -36,7 +36,7 @@ function TestClass(props) {
 			<Button variant="contained" onClick={signInWithGoogle} disabled={isSignedIn}>
 				Sign in with Google
 			</Button>
-			<Button variant="contained" color="error" onClick={logOut} disabled={!isSignedIn}>
+			<Button variant="contained" color="error" onClick={logOut} disabled={false}>
 				Sign out
 			</Button>
 			<Auth setAuthState={setAuthState} />

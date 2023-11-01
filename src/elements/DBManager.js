@@ -1,9 +1,16 @@
+import { collection, getFirestore } from "firebase/firestore";
+import { db } from "./Auth";
+
+
 const { BugReport } = require("./BugReport");
 
 class DBManager {
     constructor() {
         // use the localstorage to store the data
         this.db = window.localStorage;
+        // if ()
+        // collection(db, "users/" ).get().then((querySnapshot) => {
+        // }
         this.reports = this.getFromStorage() || {};
     }
 
