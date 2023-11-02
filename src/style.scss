@@ -14,6 +14,40 @@ html {
   font-family: 'Roboto', sans-serif;
 }
 
+p {
+  margin: 0rem !important;
+}
+
+.bugModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--dark-color);
+  width: 100%;
+  margin: auto;
+  padding: 2rem;
+  border-radius: 5px;
+  max-width: 350px;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.bugModal p {
+  margin-bottom: 0.2rem !important;
+  margin-top: 0.5rem !important;
+}
+
 #root {
   height: 100vh;
   width: 100vw;
@@ -32,4 +66,36 @@ html {
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+.bugTable {
+  max-width: 800px;
+  width: 100% !important;
+}
+
+.absReport {
+  position: absolute;
+  background-color: rgba(74, 74, 74, 0.411);
+}
+
+.fakeReport {
+  color: transparent !important;
+  background-color: transparent !important;
+}
+
+.report {
+  padding: 1rem;
+  background-color: rgba(74, 74, 74, 0.411);
+  border-radius: 5px;
+  cursor: grab;
+}
+
+td {
+  padding: 0.5rem !important;
+  border: 0 !important;
+  width: 33% !important;
+}
+
+.report:active {
+  cursor: grabbing;
 }

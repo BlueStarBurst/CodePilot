@@ -1,69 +1,159 @@
 import { collection, getFirestore } from "firebase/firestore";
 import { db } from "./Auth";
 
-
-const { BugReport } = require("./BugReport");
+import { BugReportData } from "./BugReport";
 
 class DBManager {
-    constructor() {
-        // use the localstorage to store the data
-        this.db = window.localStorage;
-        // if ()
-        // collection(db, "users/" ).get().then((querySnapshot) => {
-        // }
-        this.reports = this.getFromStorage() || {};
+	constructor() {
+		// use the localstorage to store the data
+		this.db = window.localStorage;
+		// if ()
+		// collection(db, "users/" ).get().then((querySnapshot) => {
+		// }
+		this.reports = this.getFromStorage("reports") || {};
+		this.todo = this.getFromStorage("todo") || {};
+		this.inprog = this.getFromStorage("inprog") || {};
+		this.done = this.getFromStorage("done") || {};
+	}
+
+	static instance = null;
+
+	static getInstance() {
+		if (!DBManager.instance) {
+			DBManager.instance = new DBManager();
+		}
+		return DBManager.instance;
+	}
+
+    getBugReportID() {
+        return Object.keys(this.reports).length;
     }
 
-    getFromStorage(key) {
-        try {
-            return JSON.parse(this.db.getItem(key));
-        } catch (e) {
-            return null;
-        }
-    }
+	getFromStorage(key) {
+		try {
+			return JSON.parse(this.db.getItem(key));
+		} catch (e) {
+			return null;
+		}
+	}
 
-    saveToStorage(key, value) {
-        this.db.setItem(key, JSON.stringify(value));
-    }
+	saveToStorage(key, value) {
+		this.db.setItem(key, JSON.stringify(value));
+	}
 
-    autoSave() {
-        this.saveToStorage("reports", this.reports);
-    }
+	autoSave() {
+		this.saveToStorage("todo", this.todo);
+		this.saveToStorage("inprog", this.inprog);
+		this.saveToStorage("done", this.done);
+		this.saveToStorage("reports", this.reports);
+	}
 
-    createDB() {
-        // create the database
-        this.reports = {};
-    }
+	createDB() {
+		// create the database
+		this.reports = {};
+		this.todo = {};
+		this.inprog = {};
+		this.done = {};
+	}
 
-    createBugReport(name, description, priority) {
-        var date = new Date();
-        var br = BugReport(name, description, priority, date);
-        this.reports[br.id] = br;
-        this.autoSave();
-    }
+	createBugReport(name, description, priority) {
+		var date = new Date();
+		var br = new BugReportData(name, description, priority, date);
+		this.todo[br.id] = br;
+		this.reports[br.id] = br;
+		this.autoSave();
+	}
 
-    getBugReport(id) {
-        return this.reports[id];
-    }
+	getBugReport(id) {
+		return this.reports[id];
+	}
 
-    getBugReports(sort = 0) {
-        // 0 is by date, 1 is by priority, 2 is by name
-        var sorted = [];
-        switch (sort) {
-            case 0:
-                sorted = Object.values(this.reports).sort((a, b) => a.date - b.date);
-                break;
-            case 1:
-                sorted = Object.values(this.reports).sort((a, b) => a.priority - b.priority);
-                break;
-            case 2:
-                sorted = Object.values(this.reports).sort((a, b) => a.name - b.name);
-                break;
-            default:
-                sorted = Object.values(this.reports);
-                break;
-        }
-        return sorted;
-    }
-
+	getBugReports(sort = 0) {
+		// 0/1 is by date asc/desc, 2/3 is by priority asc/desc, 4/5 is by name asc/desc
+		var sortedR = [];
+		var sortedT = [];
+		var sortedI = [];
+		var sortedD = [];
+		switch (sort) {
+			case 0:
+				sortedR = Object.values(this.reports).sort((a, b) => a.date - b.date);
+				sortedT = Object.values(this.todo).sort((a, b) => a.date - b.date);
+				sortedI = Object.values(this.inprog).sort((a, b) => a.date - b.date);
+				sortedD = Object.values(this.done).sort((a, b) => a.date - b.date);
+				break;
+			case 1:
+				sortedR = Object.values(this.reports).sort((a, b) => b.date - a.date);
+				sortedT = Object.values(this.todo).sort((a, b) => b.date - a.date);
+				sortedI = Object.values(this.inprog).sort((a, b) => b.date - a.date);
+				sortedD = Object.values(this.done).sort((a, b) => b.date - a.date);
+				break;
+			case 2:
+				sortedR = Object.values(this.reports).sort(
+					(a, b) => a.priority - b.priority
+				);
+				sortedT = Object.values(this.todo).sort(
+					(a, b) => a.priority - b.priority
+				);
+				sortedI = Object.values(this.inprog).sort(
+					(a, b) => a.priority - b.priority
+				);
+				sortedD = Object.values(this.done).sort(
+					(a, b) => a.priority - b.priority
+				);
+				break;
+			case 3:
+				sortedR = Object.values(this.reports).sort(
+					(a, b) => b.priority - a.priority
+				);
+				sortedT = Object.values(this.todo).sort(
+					(a, b) => b.priority - a.priority
+				);
+				sortedI = Object.values(this.inprog).sort(
+					(a, b) => b.priority - a.priority
+				);
+				sortedD = Object.values(this.done).sort(
+					(a, b) => b.priority - a.priority
+				);
+				break;
+			case 4:
+				sortedR = Object.values(this.reports).sort((a, b) =>
+					a.name.localeCompare(b.name)
+				);
+				sortedT = Object.values(this.todo).sort((a, b) =>
+					a.name.localeCompare(b.name)
+				);
+				sortedI = Object.values(this.inprog).sort((a, b) =>
+					a.name.localeCompare(b.name)
+				);
+				sortedD = Object.values(this.done).sort((a, b) =>
+					a.name.localeCompare(b.name)
+				);
+				break;
+			case 5:
+				sortedR = Object.values(this.reports).sort((a, b) =>
+					b.name.localeCompare(a.name)
+				);
+				sortedT = Object.values(this.todo).sort((a, b) =>
+					b.name.localeCompare(a.name)
+				);
+				sortedI = Object.values(this.inprog).sort((a, b) =>
+					b.name.localeCompare(a.name)
+				);
+				sortedD = Object.values(this.done).sort((a, b) =>
+					b.name.localeCompare(a.name)
+				);
+				break;
+			default:
+				sortedR = Object.values(this.reports).sort((a, b) => a.date - b.date);
+				sortedT = Object.values(this.todo).sort((a, b) => a.date - b.date);
+				sortedI = Object.values(this.inprog).sort((a, b) => a.date - b.date);
+				sortedD = Object.values(this.done).sort((a, b) => a.date - b.date);
+				break;
+		}
+		return [sortedR, sortedT, sortedI, sortedD];
+	}
 }
+
+DBManager.instance = new DBManager();
+
+export default DBManager;

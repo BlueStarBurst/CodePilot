@@ -71,4 +71,6 @@ function TestClass(props) {
 
 render(<TestClass />, document.getElementById("root"));
 
-// signInWithGoogle();
+document.addEventListener("dragover", (event) => {
+    event.preventDefault();
+});
