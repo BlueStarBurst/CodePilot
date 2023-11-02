@@ -1,5 +1,5 @@
 import {
-    Box,
+	Box,
 	Button,
 	Modal,
 	Paper,
@@ -40,7 +40,9 @@ export default function Dashboard(props) {
 		setInProgress(reportList[2]);
 		setCompleted(reportList[3]);
 
-		setRows(Math.max(reportList[1].length, reportList[2].length, reportList[3].length));
+		setRows(
+			Math.max(reportList[1].length, reportList[2].length, reportList[3].length)
+		);
 		var rowList = [...Array(rows)].map((row, i) => i);
 		console.log(rowList);
 	}
@@ -64,55 +66,35 @@ export default function Dashboard(props) {
 					<TableHead sx={{ backgroundColor: "#000000" }}>
 						<TableRow>
 							<TableCell>To-Do</TableCell>
-							<TableCell>In Progress</TableCell>
-							<TableCell>Completed</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{[...Array(rows)].map((row, i) => (
-							<TableRow key={i}>
-								<TableCell>
-									{i < todo.length ? <BugReport bugRep={todo[i]} /> : null}
-								</TableCell>
-								<TableCell>
-									{i < inProgress.length ? (
-										<BugReport bugRep={inProgress[i]} />
-									) : null}
-								</TableCell>
-								<TableCell>
-									{i < completed.length ? (
-										<BugReport bugRep={completed[i]} />
-									) : null}
-								</TableCell>
-							</TableRow>
+						{todo.map((br, i) => (
+							<BugReport bugRep={br} />
 						))}
 					</TableBody>
 				</Table>
 				<Table stickyHeader>
 					<TableHead sx={{ backgroundColor: "#000000" }}>
 						<TableRow>
-							<TableCell>To-Do</TableCell>
 							<TableCell>In Progress</TableCell>
-							<TableCell>Completed</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{[...Array(rows)].map((row, i) => (
-							<TableRow key={i}>
-								<TableCell>
-									{i < todo.length ? <BugReport bugRep={todo[i]} /> : null}
-								</TableCell>
-								<TableCell>
-									{i < inProgress.length ? (
-										<BugReport bugRep={inProgress[i]} />
-									) : null}
-								</TableCell>
-								<TableCell>
-									{i < completed.length ? (
-										<BugReport bugRep={completed[i]} />
-									) : null}
-								</TableCell>
-							</TableRow>
+						{inProgress.map((br, i) => (
+							<BugReport bugRep={br} />
+						))}
+					</TableBody>
+				</Table>
+				<Table stickyHeader>
+					<TableHead sx={{ backgroundColor: "#000000" }}>
+						<TableRow>
+							<TableCell>Done</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{completed.map((br, i) => (
+							<BugReport bugRep={br} />
 						))}
 					</TableBody>
 				</Table>

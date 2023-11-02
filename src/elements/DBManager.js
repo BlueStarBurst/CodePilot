@@ -64,6 +64,14 @@ class DBManager {
 		this.autoSave();
 	}
 
+    deleteBugReport(id) {
+        delete this.reports[id];
+        delete this.todo[id];
+        delete this.inprog[id];
+        delete this.done[id];
+        this.autoSave();
+    }
+
 	getBugReport(id) {
 		return this.reports[id];
 	}

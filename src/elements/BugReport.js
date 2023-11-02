@@ -1,4 +1,11 @@
-import { Button, Modal, Select, TextField } from "@mui/material";
+import {
+	Button,
+	Modal,
+	Select,
+	TableCell,
+	TableRow,
+	TextField,
+} from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import DBManager from "./DBManager";
 
@@ -36,6 +43,10 @@ export default function BugReport(props) {
 	const [priority, setPriority] = useState("");
 	const [date, setDate] = useState("");
 
+	const [height, setHeight] = useState(0);
+	const [width, setWidth] = useState(0);
+	const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+
 	const [isDragging, setIsDragging] = useState(false);
 
 	const drag = useRef(null);
@@ -47,63 +58,83 @@ export default function BugReport(props) {
 		setDescription(bugRep.description);
 		setPriority(bugRep.priority);
 		setDate(new Date(bugRep.date).toDateString());
+		setHeight(orig.current.offsetHeight);
+		setWidth(orig.current.offsetWidth);
 	}, [props.bugRep]);
 
 	useEffect(() => {
 		if (isDragging) {
-			drag.current.style.width = orig.current.offsetWidth + "px";
-			drag.current.style.height = orig.current.offsetHeight + "px";
+			drag.current.style.width = width + "px";
+			drag.current.style.height = height + "px";
 		}
 	}, [isDragging]);
 
-	function startDrag() {
+	function startDrag(e) {
 		setIsDragging(true);
+		setStartPos({ x: e.clientX, y: e.clientY });
 	}
 
 	function endDrag() {
 		setIsDragging(false);
+		console.log("end drag");
 	}
+
+	const [close, setClose] = useState(false);
 
 	function mouseMove(e) {
 		if (isDragging) {
 			console.log("dragging");
-			drag.current.style.left = (e.clientX - drag.current.offsetWidth / 2) + "px";
-			drag.current.style.top = (e.clientY - drag.current.offsetHeight / 2) + "px";
+			drag.current.style.left = e.clientX - drag.current.offsetWidth / 2 + "px";
+			drag.current.style.top = e.clientY - drag.current.offsetHeight / 2 + "px";
+			var dist = Math.sqrt(
+				Math.pow(e.clientX - startPos.x, 2) +
+					Math.pow(e.clientY - startPos.y, 2)
+			);
+			if (dist < 150) {
+				setClose(true);
+			} else {
+				setClose(false);
+			}
 		}
 	}
 
 	return (
-		<div onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={mouseMove}>
-			{isDragging ? (
-				<>
-					<div className="absReport report" ref={drag}>
-						<h5>{name}</h5>
-						<p>{description}</p>
-						<p>{priority}</p>
-						<p>{date}</p>
-					</div>
-					<div className="fakeReport report" ref={orig}>
-						<h5>{name}</h5>
-						<p>{description}</p>
-						<p>{priority}</p>
-						<p>{date}</p>
-					</div>
-				</>
-			) : (
-				<>
-					<div className="report" >
-						<h5>{name}</h5>
-						<p>{description}</p>
-						<p>{priority}</p>
-						<p>{date}</p>
-					</div>
-				</>
-			)}
-		</div>
+		<TableRow
+			onMouseDown={startDrag}
+			onMouseUp={endDrag}
+			onMouseMove={mouseMove}
+			onMouseLeave={endDrag}
+		>
+			<TableCell>
+				{isDragging ? (
+					<>
+						<div className="absReport report" ref={drag}>
+							<h5>{name}</h5>
+							<p>{description}</p>
+							<p>{priority}</p>
+							<p>{date}</p>
+						</div>
+						<div className={close ? "otherReport report" : "fakeReport report"}>
+							<h5>{name}</h5>
+							<p>{description}</p>
+							<p>{priority}</p>
+							<p>{date}</p>
+						</div>
+					</>
+				) : (
+					<>
+						<div className="trueReport report" ref={orig}>
+							<h5>{name}</h5>
+							<p>{description}</p>
+							<p>{priority}</p>
+							<p>{date}</p>
+						</div>
+					</>
+				)}
+			</TableCell>
+		</TableRow>
 	);
 }
-
-
 
 export function CreateBugReportModal(props) {
 	const [name, setName] = useState("");
