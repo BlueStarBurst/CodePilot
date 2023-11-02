@@ -10,15 +10,34 @@ import { render } from "react-dom";
 
 import "./style.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { isUserSignedIn, signInWithGoogle, Auth, logOut } from "./elements/Auth";
-import { Button } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import {
+	isUserSignedIn,
+	signInWithGoogle,
+	Auth,
+	logOut,
+} from "./elements/Auth";
+import { Button, ThemeProvider, createTheme } from "@mui/material";
+import Login from "./elements/Login";
+import Dashboard from "./elements/Dashboard";
 
+const darkTheme = createTheme({
+	palette: {
+		mode: "dark",
+	},
+});
 
+const lightTheme = createTheme({
+	palette: {
+		mode: "light",
+	},
+});
 
 function TestClass(props) {
 	const [state, setState] = useState("You are not signed in!");
 	const [isSignedIn, setIsSignedIn] = useState(false);
 	const [authState, setAuthState] = useState(null);
+	const [theme, setTheme] = useState(darkTheme);
 
 	useEffect(() => {
 		if (isUserSignedIn()) {
@@ -31,22 +50,25 @@ function TestClass(props) {
 	}, [authState]);
 
 	return (
-		<div className="flex-page">
-			<h1>{state}</h1>
-			<Button variant="contained" onClick={signInWithGoogle} disabled={isSignedIn}>
-				Sign in with Google
-			</Button>
-			<Button variant="contained" color="error" onClick={logOut} disabled={false}>
-				Sign out
-			</Button>
-			<Auth setAuthState={setAuthState} />
-		</div>
-	)
+		<ThemeProvider theme={theme}>
+			<CssBaseline />
+			<div className="flex-page">
+				{isSignedIn ? <Dashboard /> : <Login />}
+				{/* <h1>{state}</h1>
+				<Button
+					variant="contained"
+					color="error"
+					onClick={logOut}
+					disabled={false}
+				>
+					Sign out
+				</Button> */}
+				<Auth setAuthState={setAuthState} />
+			</div>
+		</ThemeProvider>
+	);
 }
 
-
-
-render(<TestClass/>, document.getElementById("root"));
-
+render(<TestClass />, document.getElementById("root"));
 
 // signInWithGoogle();
