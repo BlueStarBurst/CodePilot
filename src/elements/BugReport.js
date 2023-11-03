@@ -133,6 +133,8 @@ export default function BugReport(props) {
 				)}
 			</TableCell>
 		</TableRow>
+
+		
 	);
 }
 

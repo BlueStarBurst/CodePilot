@@ -25,6 +25,13 @@ export default function Dashboard(props) {
 	const [inProgress, setInProgress] = useState([]);
 	const [completed, setCompleted] = useState([]);
 
+	const [sortMethod, setSortMethod] = useState(0);
+	const handleSortByPriority = (method) => {
+		setSortMethod(method);
+	  };
+	  
+
+
 	function handleClose() {
 		setOpen(false);
 		refresh();
@@ -61,6 +68,14 @@ export default function Dashboard(props) {
 
 			<CreateBugReportModal open={open} handleClose={handleClose} />
 
+			<Button variant="contained" onClick={() => handleSortByPriority(2)}>
+  				Sort by Priority (Low to High)
+			</Button>
+			<Button variant="contained" onClick={() => handleSortByPriority(3)}>
+  				Sort by Priority (High to Low)
+			</Button>
+
+
 			<TableContainer component={Paper} className="bugTable">
 				<Table stickyHeader>
 					<TableHead sx={{ backgroundColor: "#000000" }}>
@@ -69,10 +84,21 @@ export default function Dashboard(props) {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{todo.map((br, i) => (
-							<BugReport bugRep={br} />
-						))}
+  						{todo
+    						.sort((a, b) => {
+      						if (sortMethod === 2) {
+        						return a.priority - b.priority;
+      						} else if (sortMethod === 3) {
+        						return b.priority - a.priority;
+      						} else {
+        						return 0;
+      						}
+    					})
+    					.map((br, i) => (
+      					  <BugReport bugRep={br} key={br.id} />
+    					))}
 					</TableBody>
+
 				</Table>
 				<Table stickyHeader>
 					<TableHead sx={{ backgroundColor: "#000000" }}>
