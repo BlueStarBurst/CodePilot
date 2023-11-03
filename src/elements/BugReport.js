@@ -242,7 +242,7 @@ export function CreateBugReportModal(props) {
 				<p>Priority</p>
 				<Select
 					native
-					value={10}
+					value={priority}
 					onChange={(e) => {
 						setPriority(e.target.value);
 					}}

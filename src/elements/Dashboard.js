@@ -27,20 +27,17 @@ export default function Dashboard(props) {
 
 	const [sortMethod, setSortMethod] = useState(0);
 
-	const handleSortByPriority = (method) => {
-		setSortMethod(method);
-	};
-
 	function handleClose() {
 		setOpen(false);
-		refresh();
+		refresh(sortMethod);
 	}
 
 	useEffect(() => {
-		refresh();
+		refresh(sortMethod);
 	}, []);
 
 	function refresh(method = 0) {
+		setSortMethod(method);
 		var reportList = DBManager.instance.getBugReports(method);
 		setTodo(reportList[1]);
 		setInProgress(reportList[2]);
@@ -61,7 +58,7 @@ export default function Dashboard(props) {
 	function moveBR(col) {
 		DBManager.instance.moveBugReport(bugId, col);
 		console.log("moved to " + col + " " + bugId);
-		refresh();
+		refresh(sortMethod);
 	}
 
 	return (
@@ -89,7 +86,7 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{todo.map((br, i) => (
-							<>
+							<React.Fragment key={i}>
 								<FakeBugReport
 									col={0}
 									mouseCol={mouseCol}
@@ -105,7 +102,7 @@ export default function Dashboard(props) {
 									bugRep={br}
 									setBugId={setBugId}
 								/>
-							</>
+							</React.Fragment>
 						))}
 						<FakeBugReport
 							col={0}
@@ -124,7 +121,7 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{inProgress.map((br, i) => (
-							<>
+							<React.Fragment key={i}>
 								<FakeBugReport
 									col={1}
 									mouseCol={mouseCol}
@@ -140,7 +137,7 @@ export default function Dashboard(props) {
 									bugRep={br}
 									setBugId={setBugId}
 								/>
-							</>
+							</React.Fragment>
 						))}
 						<FakeBugReport
 							col={1}
@@ -159,7 +156,7 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{completed.map((br, i) => (
-							<>
+							<React.Fragment key={i}>
 								<FakeBugReport
 									col={2}
 									mouseCol={mouseCol}
@@ -175,7 +172,7 @@ export default function Dashboard(props) {
 									bugRep={br}
 									setBugId={setBugId}
 								/>
-							</>
+							</React.Fragment>
 						))}
 						<FakeBugReport
 							col={2}

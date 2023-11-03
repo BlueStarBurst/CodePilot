@@ -102,7 +102,7 @@ p {
 .otherReport {
   color: transparent !important;
   background-color: transparent !important;
-  height: 90px;
+  height: 100px;
   padding: 1rem 1rem;
   transition: all 1s ease;
 }
@@ -124,7 +124,7 @@ p {
 
 .fakeClose {
   transition: all 1s ease;
-  height: 90px;
+  height: 100px;
 }
 
 .fakeFar {
@@ -134,7 +134,7 @@ p {
 
 @keyframes shrink {
   from {
-    height: 90px;
+    height: 100px;
     padding: 1rem;
   }
   to {
@@ -146,7 +146,8 @@ p {
 .trueReport {
   padding: 1rem;
   border-radius: 5px;
-  height: 90px;
+  height: max-content;
+  min-height: 100px;
   cursor: grab;
   transition: height 1s;
 }
@@ -156,6 +157,7 @@ p {
   background-color: rgba(74, 74, 74, 0.411);
   border-radius: 5px;
   cursor: grab;
+  width: 100%;
 }
 
 td {
