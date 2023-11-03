@@ -25,6 +25,12 @@ export default function Dashboard(props) {
 	const [inProgress, setInProgress] = useState([]);
 	const [completed, setCompleted] = useState([]);
 
+	const [sortMethod, setSortMethod] = useState(0);
+
+	const handleSortByPriority = (method) => {
+		setSortMethod(method);
+	};
+
 	function handleClose() {
 		setOpen(false);
 		refresh();
@@ -34,8 +40,8 @@ export default function Dashboard(props) {
 		refresh();
 	}, []);
 
-	function refresh() {
-		var reportList = DBManager.instance.getBugReports();
+	function refresh(method = 0) {
+		var reportList = DBManager.instance.getBugReports(method);
 		setTodo(reportList[1]);
 		setInProgress(reportList[2]);
 		setCompleted(reportList[3]);
@@ -64,6 +70,13 @@ export default function Dashboard(props) {
 			<h1>Dashboard</h1>
 
 			<CreateBugReportModal open={open} handleClose={handleClose} />
+
+			<Button variant="contained" onClick={() => refresh(2)}>
+				Sort by Priority (Low to High)
+			</Button>
+			<Button variant="contained" onClick={() => refresh(3)}>
+				Sort by Priority (High to Low)
+			</Button>
 
 			<TableContainer component={Paper} className="bugTable">
 				<Table stickyHeader>
