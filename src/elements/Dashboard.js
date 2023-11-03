@@ -191,6 +191,7 @@ export default function Dashboard(props) {
 					color="warning"
 					onClick={() => {
 						DBManager.instance.clearTable();
+						refresh(sortMethod);
 					}}
 				>
 					Clear Table
