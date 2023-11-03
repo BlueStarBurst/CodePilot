@@ -183,6 +183,14 @@ class DBManager {
 		}
 		return [sortedR, sortedT, sortedI, sortedD];
 	}
+
+    clearTable() {
+        this.reports = {};
+        this.todo = {};
+        this.inprog = {};
+        this.done = {};
+        this.autoSave();
+    }
 }
 
 DBManager.instance = new DBManager();

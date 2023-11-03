@@ -188,6 +188,15 @@ export default function Dashboard(props) {
 			<div className="flex-row">
 				<Button
 					variant="contained"
+					color="warning"
+					onClick={() => {
+						DBManager.instance.clearTable();
+					}}
+				>
+					Clear Table
+				</Button>
+				<Button
+					variant="contained"
 					onClick={() => {
 						setOpen(true);
 					}}
