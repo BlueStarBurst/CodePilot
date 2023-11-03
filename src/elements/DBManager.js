@@ -29,6 +29,29 @@ class DBManager {
         return Object.keys(this.reports).length;
     }
 
+    moveBugReport(id, col) {
+        var br = this.reports[id];
+        delete this.todo[id];
+        delete this.inprog[id];
+        delete this.done[id];
+        switch (col) {
+            case 0:
+                this.todo[id] = br;
+                break;
+            case 1:
+                this.inprog[id] = br;
+                break;
+            case 2:
+                this.done[id] = br;
+                break;
+            default:
+                this.todo[id] = br;
+                break;
+        }
+        console.log(this.inprog);
+        this.autoSave();
+    }
+
 	getFromStorage(key) {
 		try {
 			return JSON.parse(this.db.getItem(key));

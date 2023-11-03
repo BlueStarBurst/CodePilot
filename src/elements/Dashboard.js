@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { logOut } from "./Auth";
-import BugReport, { CreateBugReportModal } from "./BugReport";
+import BugReport, { CreateBugReportModal, FakeBugReport } from "./BugReport";
 import DBManager from "./DBManager";
 
 export default function Dashboard(props) {
@@ -47,17 +47,21 @@ export default function Dashboard(props) {
 		console.log(rowList);
 	}
 
+	const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+	const [dragging, setDragging] = useState(false);
+	const [mouseCol, setMouseCol] = useState(0);
+	const [bugId, setBugId] = useState(0);
+
+	function moveBR(col) {
+		DBManager.instance.moveBugReport(bugId, col);
+		console.log("moved to " + col + " " + bugId);
+		refresh();
+	}
+
 	return (
 		<>
+			<br />
 			<h1>Dashboard</h1>
-			<Button
-				variant="contained"
-				onClick={() => {
-					setOpen(true);
-				}}
-			>
-				Create Report
-			</Button>
 
 			<CreateBugReportModal open={open} handleClose={handleClose} />
 
@@ -70,8 +74,31 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{todo.map((br, i) => (
-							<BugReport bugRep={br} />
+							<>
+								<FakeBugReport
+									col={0}
+									mouseCol={mouseCol}
+									dragging={dragging}
+									mousePos={mousePos}
+									moveBR={moveBR}
+								/>
+								<BugReport
+									col={0}
+									setMouseCol={setMouseCol}
+									setDragging={setDragging}
+									setMousePos={setMousePos}
+									bugRep={br}
+									setBugId={setBugId}
+								/>
+							</>
 						))}
+						<FakeBugReport
+							col={0}
+							mouseCol={mouseCol}
+							dragging={dragging}
+							mousePos={mousePos}
+							moveBR={moveBR}
+						/>
 					</TableBody>
 				</Table>
 				<Table stickyHeader>
@@ -82,8 +109,31 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{inProgress.map((br, i) => (
-							<BugReport bugRep={br} />
+							<>
+								<FakeBugReport
+									col={1}
+									mouseCol={mouseCol}
+									dragging={dragging}
+									mousePos={mousePos}
+									moveBR={moveBR}
+								/>
+								<BugReport
+									col={1}
+									setMouseCol={setMouseCol}
+									setDragging={setDragging}
+									setMousePos={setMousePos}
+									bugRep={br}
+									setBugId={setBugId}
+								/>
+							</>
 						))}
+						<FakeBugReport
+							col={1}
+							mouseCol={mouseCol}
+							dragging={dragging}
+							mousePos={mousePos}
+							moveBR={moveBR}
+						/>
 					</TableBody>
 				</Table>
 				<Table stickyHeader>
@@ -94,20 +144,54 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{completed.map((br, i) => (
-							<BugReport bugRep={br} />
+							<>
+								<FakeBugReport
+									col={2}
+									mouseCol={mouseCol}
+									dragging={dragging}
+									mousePos={mousePos}
+									moveBR={moveBR}
+								/>
+								<BugReport
+									col={2}
+									setMouseCol={setMouseCol}
+									setDragging={setDragging}
+									setMousePos={setMousePos}
+									bugRep={br}
+									setBugId={setBugId}
+								/>
+							</>
 						))}
+						<FakeBugReport
+							col={2}
+							mouseCol={mouseCol}
+							dragging={dragging}
+							mousePos={mousePos}
+							moveBR={moveBR}
+						/>
 					</TableBody>
 				</Table>
 			</TableContainer>
 
-			<Button
-				variant="contained"
-				color="error"
-				onClick={logOut}
-				disabled={false}
-			>
-				Sign out
-			</Button>
+			<div className="flex-row">
+				<Button
+					variant="contained"
+					onClick={() => {
+						setOpen(true);
+					}}
+				>
+					Create Report
+				</Button>
+				<Button
+					variant="contained"
+					color="error"
+					onClick={logOut}
+					disabled={false}
+				>
+					Sign out
+				</Button>
+			</div>
+			<br />
 		</>
 	);
 }

@@ -7,7 +7,6 @@
 }
 
 html {
-  overflow: hidden;
   scroll-behavior: smooth;
   width: 100vw !important;
   height: 100vh;
@@ -51,7 +50,6 @@ p {
 #root {
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
   position: absolute;
   top: 0;
 }
@@ -65,7 +63,7 @@ p {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: auto;
 }
 
 .bugTable {
@@ -75,7 +73,10 @@ p {
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
+  height: max-content;
 }
+
+
 
 .bugTable table {
   width: 33.3% !important;
@@ -94,9 +95,8 @@ p {
   color: transparent !important;
   background-color: transparent !important;
   height: 0;
-  padding: 0 1;
+  padding: 0 1rem 0 1rem !important;
   transition: all 1s ease;
-  animation: shrink 1s;
 }
 
 .otherReport {
@@ -104,6 +104,31 @@ p {
   background-color: transparent !important;
   height: 90px;
   padding: 1rem 1rem;
+  transition: all 1s ease;
+}
+
+.far {
+  padding: 0 !important;
+  transition: all 1s ease;
+}
+
+.far td {
+  padding: 0 !important;
+  transition: all 1s ease;
+}
+
+.close {
+  padding: 1rem !important;
+  transition: all 1s ease;
+}
+
+.fakeClose {
+  transition: all 1s ease;
+  height: 90px;
+}
+
+.fakeFar {
+  height: 0;
   transition: all 1s ease;
 }
 
@@ -142,4 +167,13 @@ td {
   cursor: grabbing;
   opacity: 1;
   z-index: 100;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }

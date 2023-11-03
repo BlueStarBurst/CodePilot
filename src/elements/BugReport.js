@@ -10,7 +10,7 @@ import React, { useState, useEffect, useRef } from "react";
 import DBManager from "./DBManager";
 
 export class BugReportData {
-	constructor(name, description, priority, date) {
+	constructor(name, description, priority, date, id=0) {
 		this.name = name;
 		this.description = description;
 		this.priority = priority;
@@ -23,7 +23,8 @@ export class BugReportData {
 			json.name,
 			json.description,
 			json.priority,
-			json.date
+			json.date,
+			json.id
 		);
 	}
 
@@ -33,8 +34,52 @@ export class BugReportData {
 			description: this.description,
 			priority: this.priority,
 			date: this.date,
+			id: this.id,
 		};
 	}
+}
+
+export function FakeBugReport(props) {
+	const ref = useRef(null);
+	const [close, setClose] = useState(false);
+
+	useEffect(() => {
+		if (props.mouseCol == props.col) {
+			setClose(false);
+			return;
+		}
+		if (!props.dragging) {
+			if (close) {
+				props.moveBR(props.col);
+			}
+			setClose(false);
+			return;
+		}
+		
+		console.log(props.mousePos);
+		if (props.dragging && props.mousePos) {
+			var left = ref.current.getBoundingClientRect().left + ref.current.offsetWidth / 2;
+			var top = ref.current.getBoundingClientRect().top + ref.current.offsetHeight;
+			// if pos is within 150px of mousePos, set close to true
+			var dist = Math.sqrt(
+				Math.pow(props.mousePos.x - left, 2) +
+					Math.pow(props.mousePos.y - top, 2)
+			);
+			
+			if (dist < 100) {
+				console.log("CLOSE");
+				setClose(true);
+			} else {
+				setClose(false);
+			}
+		}
+	}, [props.mousePos, props.dragging, props.mouseCol]);
+
+	return (
+		<TableRow ref={ref}>
+			<div className={close ? "fakeClose" : "fakeFar"}></div>
+		</TableRow>
+	);
 }
 
 export default function BugReport(props) {
@@ -42,6 +87,7 @@ export default function BugReport(props) {
 	const [description, setDescription] = useState("");
 	const [priority, setPriority] = useState("");
 	const [date, setDate] = useState("");
+	const [id, setId] = useState(0);
 
 	const [height, setHeight] = useState(0);
 	const [width, setWidth] = useState(0);
@@ -58,6 +104,7 @@ export default function BugReport(props) {
 		setDescription(bugRep.description);
 		setPriority(bugRep.priority);
 		setDate(new Date(bugRep.date).toDateString());
+		setId(bugRep.id);
 		setHeight(orig.current.offsetHeight);
 		setWidth(orig.current.offsetWidth);
 	}, [props.bugRep]);
@@ -66,26 +113,38 @@ export default function BugReport(props) {
 		if (isDragging) {
 			drag.current.style.width = width + "px";
 			drag.current.style.height = height + "px";
+			drag.current.style.left = startPos.x - drag.current.offsetWidth / 2 + "px";
+			drag.current.style.top = startPos.y - drag.current.offsetHeight / 2 + "px";
 		}
 	}, [isDragging]);
 
 	function startDrag(e) {
+		e.preventDefault();
 		setIsDragging(true);
+		props.setBugId(id);
+		props.setDragging(true);
+		props.setMouseCol(props.col);
 		setStartPos({ x: e.clientX, y: e.clientY });
 	}
 
 	function endDrag() {
-		setIsDragging(false);
+		if (isDragging) {
+			setIsDragging(false);
+			props.setDragging(false);
+		}
 		console.log("end drag");
 	}
 
 	const [close, setClose] = useState(false);
 
 	function mouseMove(e) {
+		e.preventDefault();
+		e.stopPropagation();
 		if (isDragging) {
 			console.log("dragging");
 			drag.current.style.left = e.clientX - drag.current.offsetWidth / 2 + "px";
 			drag.current.style.top = e.clientY - drag.current.offsetHeight / 2 + "px";
+			props.setMousePos({ x: e.clientX, y: e.clientY });
 			var dist = Math.sqrt(
 				Math.pow(e.clientX - startPos.x, 2) +
 					Math.pow(e.clientY - startPos.y, 2)
@@ -104,6 +163,7 @@ export default function BugReport(props) {
 			onMouseUp={endDrag}
 			onMouseMove={mouseMove}
 			onMouseLeave={endDrag}
+			className={close || !isDragging ? "close" : "far"}
 		>
 			<TableCell>
 				{isDragging ? (
@@ -123,7 +183,7 @@ export default function BugReport(props) {
 					</>
 				) : (
 					<>
-						<div className="trueReport report" ref={orig}>
+						<div className="trueReport report" unselectable="true" ref={orig}>
 							<h5>{name}</h5>
 							<p>{description}</p>
 							<p>{priority}</p>
