@@ -171,13 +171,13 @@ export default function BugReport(props) {
 						<div className="absReport report" ref={drag}>
 							<h5>{name}</h5>
 							<p>{description}</p>
-							<p>{priority}</p>
+							<p>{priority==30 ? "High" : priority==20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 						<div className={close ? "otherReport report" : "fakeReport report"}>
 							<h5>{name}</h5>
 							<p>{description}</p>
-							<p>{priority}</p>
+							<p>{priority==30 ? "High" : priority==20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 					</>
@@ -186,7 +186,7 @@ export default function BugReport(props) {
 						<div className="trueReport report" unselectable="true" ref={orig}>
 							<h5>{name}</h5>
 							<p>{description}</p>
-							<p>{priority}</p>
+							<p>{priority==30 ? "High" : priority==20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 					</>

@@ -71,12 +71,14 @@ export default function Dashboard(props) {
 
 			<CreateBugReportModal open={open} handleClose={handleClose} />
 
-			<Button variant="contained" onClick={() => refresh(2)}>
-				Sort by Priority (Low to High)
-			</Button>
-			<Button variant="contained" onClick={() => refresh(3)}>
-				Sort by Priority (High to Low)
-			</Button>
+			<div className="flex-row">
+				<Button variant="contained" onClick={() => refresh(2)}>
+					Sort by Priority (Low to High)
+				</Button>
+				<Button variant="contained" onClick={() => refresh(3)}>
+					Sort by Priority (High to Low)
+				</Button>
+			</div>
 
 			<TableContainer component={Paper} className="bugTable">
 				<Table stickyHeader>
