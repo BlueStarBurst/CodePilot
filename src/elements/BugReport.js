@@ -10,7 +10,7 @@ import React, { useState, useEffect, useRef } from "react";
 import DBManager from "./DBManager";
 
 export class BugReportData {
-	constructor(name, description, priority, date, id=0) {
+	constructor(name, description, priority, date, id = 0) {
 		this.name = name;
 		this.description = description;
 		this.priority = priority;
@@ -55,17 +55,19 @@ export function FakeBugReport(props) {
 			setClose(false);
 			return;
 		}
-		
+
 		console.log(props.mousePos);
 		if (props.dragging && props.mousePos) {
-			var left = ref.current.getBoundingClientRect().left + ref.current.offsetWidth / 2;
-			var top = ref.current.getBoundingClientRect().top + ref.current.offsetHeight;
+			var left =
+				ref.current.getBoundingClientRect().left + ref.current.offsetWidth / 2;
+			var top =
+				ref.current.getBoundingClientRect().top + ref.current.offsetHeight;
 			// if pos is within 150px of mousePos, set close to true
 			var dist = Math.sqrt(
 				Math.pow(props.mousePos.x - left, 2) +
 					Math.pow(props.mousePos.y - top, 2)
 			);
-			
+
 			if (dist < 100) {
 				console.log("CLOSE");
 				setClose(true);
@@ -99,22 +101,35 @@ export default function BugReport(props) {
 	const orig = useRef(null);
 
 	useEffect(() => {
+		if (orig.current == null) return;
+		setHeight(orig.current.offsetHeight);
+		setWidth(orig.current.offsetWidth);
+		console.log("set height and width");
+		console.log(orig.current.offsetHeight);
+		console.log(orig.current.offsetWidth);
+	}, [orig.current]);
+
+	useEffect(() => {
 		var bugRep = props.bugRep;
 		setName(bugRep.name);
 		setDescription(bugRep.description);
 		setPriority(bugRep.priority);
 		setDate(new Date(bugRep.date).toDateString());
 		setId(bugRep.id);
-		setHeight(orig.current.offsetHeight);
-		setWidth(orig.current.offsetWidth);
 	}, [props.bugRep]);
 
 	useEffect(() => {
 		if (isDragging) {
 			drag.current.style.width = width + "px";
 			drag.current.style.height = height + "px";
-			drag.current.style.left = startPos.x - drag.current.offsetWidth / 2 + "px";
-			drag.current.style.top = startPos.y - drag.current.offsetHeight / 2 + "px";
+			drag.current.style.left =
+				startPos.x - drag.current.offsetWidth / 2 + "px";
+			drag.current.style.top =
+				startPos.y - drag.current.offsetHeight / 2 + "px";
+		} else if (width != 0 && height != 0) {
+			orig.current.style.width = width + "px !important";
+			orig.current.style.height = height + "px !important";
+			console.log("set orig");
 		}
 	}, [isDragging]);
 
@@ -129,10 +144,15 @@ export default function BugReport(props) {
 
 	function endDrag() {
 		if (isDragging) {
+			drag.current.style.width = width + "px !important";
+			drag.current.style.height = height + "px !important";
 			setIsDragging(false);
 			props.setDragging(false);
 		}
 		console.log("end drag");
+
+		// orig.current.style.width = width + "px";
+		// orig.current.style.height = height + "px";
 	}
 
 	const [close, setClose] = useState(false);
@@ -171,13 +191,13 @@ export default function BugReport(props) {
 						<div className="absReport report" ref={drag}>
 							<h5>{name}</h5>
 							<p>{description}</p>
-							<p>{priority==30 ? "High" : priority==20 ? "Med" : "Low"}</p>
+							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 						<div className={close ? "otherReport report" : "fakeReport report"}>
 							<h5>{name}</h5>
 							<p>{description}</p>
-							<p>{priority==30 ? "High" : priority==20 ? "Med" : "Low"}</p>
+							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 					</>
@@ -186,15 +206,13 @@ export default function BugReport(props) {
 						<div className="trueReport report" unselectable="true" ref={orig}>
 							<h5>{name}</h5>
 							<p>{description}</p>
-							<p>{priority==30 ? "High" : priority==20 ? "Med" : "Low"}</p>
+							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 					</>
 				)}
 			</TableCell>
 		</TableRow>
-
-		
 	);
 }
 
