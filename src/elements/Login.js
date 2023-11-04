@@ -7,6 +7,7 @@ export default function Login(props) {
 		<>
 			<h1>CodePilot</h1>
             <p>Sign in to get access to all our bug tracking features!</p>
+			<br/>
 			<Button
 				variant="contained"
 				onClick={signInWithGoogle}
