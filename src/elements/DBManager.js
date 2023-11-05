@@ -191,6 +191,22 @@ class DBManager {
         this.done = {};
         this.autoSave();
     }
+
+	saveProfile(profile) {
+		this.profile = profile;
+		this.saveToStorage("profile", profile);
+		this.autoSave();
+	}
+
+	getProfile() {
+		if (this.profile) {
+			return this.profile;
+		} else {
+			return this.getFromStorage("profile");
+		}
+	}
+
+
 }
 
 DBManager.instance = new DBManager();
