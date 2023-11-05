@@ -20,6 +20,7 @@ import {
 import { Button, ThemeProvider, createTheme } from "@mui/material";
 import Login from "./elements/Login";
 import Dashboard from "./elements/Dashboard";
+import CreateProfile from "./elements/CreateProfile";
 
 const darkTheme = createTheme({
 	palette: {
@@ -39,30 +40,44 @@ function TestClass(props) {
 	const [authState, setAuthState] = useState(null);
 	const [theme, setTheme] = useState(darkTheme);
 
+	const [userProfile, setUserProfile] = useState(null);
+	const [hasProfile, setHasProfile] = useState(false); // Track whether the user has created a profile
+
 	useEffect(() => {
 		if (isUserSignedIn()) {
 			setState("You are signed in!");
 			setIsSignedIn(true);
+
+			// Check if the user has a profile, and if not, set hasProfile to false
+			if (!hasProfile) {
+				setHasProfile(false);
+			} 
+			else {
+				setHasProfile(true);
+			}
 		} else {
 			setState("You are not signed in!");
 			setIsSignedIn(false);
 		}
 	}, [authState]);
 
+	const handleProfileSubmit = (profileData) => {
+		// Save the user's profile data to backed or state
+		setUserProfile(profileData);
+
+		//Set hasProfile to true once the user creates a profile
+		setHasProfile(true); 
+	};
+
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<div className="flex-page">
-				{isSignedIn ? <Dashboard /> : <Login />}
-				{/* <h1>{state}</h1>
-				<Button
-					variant="contained"
-					color="error"
-					onClick={logOut}
-					disabled={false}
-				>
-					Sign out
-				</Button> */}
+				{isSignedIn ? (hasProfile ? (
+					<Dashboard userProfile = {userProfile} />
+				) : (
+					<CreateProfile onProfileSubmit = {handleProfileSubmit} />
+				)) : <Login />}
 				<Auth setAuthState={setAuthState} />
 			</div>
 		</ThemeProvider>

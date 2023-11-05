@@ -34,7 +34,6 @@
         "uuid": "^8.3.2"
     },
     "author": "Bryant Hargreaves",
-    "main": "lib/index.js",
     "license": "MIT",
     "devDependencies": {
         "@babel/core": "^7.20.12",
