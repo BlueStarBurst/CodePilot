@@ -20,6 +20,7 @@ export class BugReportData {
 		this.priority = priority; // priority of the bug report
 		this.date = date; // date of the bug report
 		this.id = DBManager.instance.getBugReportID(); // unique id of the bug report
+		this.customMetrics = []; // Array to store custom metrics
 	}
 
 	static fromJSON(json) {
@@ -83,6 +84,8 @@ export class BugReportData {
 		};
 		input.click();
 	}
+
+	
 }
 
 // BRYANT HARGREAVES
@@ -430,3 +433,34 @@ export function CreateBugReportModal(props) {
 		</Modal>
 	);
 }
+
+
+class CustomMetric {
+	constructor(name, description, type) {
+	  this.name = name;
+	  this.description = description;
+	  this.type = type; // e.g., 'text', 'number', 'date'
+	  this.value = null; // You can set the value as needed
+	}
+  
+	addCustomMetric(name, description, type) {
+	  this.customMetrics.push(new CustomMetric(name, description, type));
+	}
+  
+	updateCustomMetric(index, name, description, type) {
+	  const metric = this.customMetrics[index];
+	  if (metric) {
+		metric.name = name;
+		metric.description = description;
+		metric.type = type;
+	  }
+	}
+  
+	deleteCustomMetric(index) {
+	  this.customMetrics.splice(index, 1);
+	}
+};
+
+  
+
+
