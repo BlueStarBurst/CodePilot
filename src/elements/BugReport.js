@@ -51,13 +51,41 @@ export class BugReportData {
 			encodeURIComponent(JSON.stringify(this.toJSON()));
 		var downloadAnchorNode = document.createElement("a");
 		downloadAnchorNode.setAttribute("href", dataStr);
-		downloadAnchorNode.setAttribute("download", "bugReport.json");
+		downloadAnchorNode.setAttribute("download", this.name + ".report");
 		document.body.appendChild(downloadAnchorNode); // required for firefox
 		downloadAnchorNode.click();
 		downloadAnchorNode.remove();
 	}
+
+	static upload(onFinish) {
+		// Used for uploading the bug report
+		var input = document.createElement("input");
+		input.type = "file";
+		input.accept = ".report";
+		input.onchange = (e) => {
+			var file = e.target.files[0];
+			if (!file) return;
+			var reader = new FileReader();
+			reader.onload = (e) => {
+				var contents = e.target.result;
+				var json = JSON.parse(contents);
+				var report = BugReportData.fromJSON(json);
+				DBManager.getInstance().createBugReport(
+					report.name,
+					report.description,
+					report.priority,
+					report.date
+				);
+				DBManager.getInstance().autoSave();
+				onFinish();
+			};
+			reader.readAsText(file);
+		};
+		input.click();
+	}
 }
 
+// BRYANT HARGREAVES
 export function FakeBugReport(props) {
 	const ref = useRef(null);
 	const [close, setClose] = useState(false);
@@ -103,6 +131,8 @@ export function FakeBugReport(props) {
 	);
 }
 
+
+// BRYANT HARGREAVES
 export default function BugReport(props) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
@@ -162,12 +192,12 @@ export default function BugReport(props) {
 	function detectLeftButton(event) {
 		if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
 			return false;
-		} else if ('buttons' in event) {
+		} else if ("buttons" in event) {
 			return event.buttons === 1;
-		} else if ('which' in event) {
+		} else if ("which" in event) {
 			return event.which === 1;
 		} else {
-			return (event.button == 1 || event.type == 'click');
+			return event.button == 1 || event.type == "click";
 		}
 	}
 	// when the user starts dragging the element, set the start position and set isDragging to true
@@ -264,7 +294,9 @@ export default function BugReport(props) {
 						<div className="trueReport report" unselectable="true" ref={orig}>
 							<div className="flex-bug-head">
 								<h5>{name}</h5>
-								<p onClick={edit} id="custom" className="edit"><FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} /></p>
+								<p onClick={edit} id="custom" className="edit">
+									<FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} />
+								</p>
 							</div>
 							<p>{description}</p>
 							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
@@ -277,14 +309,22 @@ export default function BugReport(props) {
 	);
 }
 
+// BRYANT HARGREAVES
 export function CreateBugReportModal(props) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [priority, setPriority] = useState("");
 
+	// when the user clicks the submit button, create the bug report
 	function createReport() {
 		if (props.editingId != -1) {
-			DBManager.getInstance().editBugReport(props.editingId, name, description, priority);
+			DBManager.getInstance().editBugReport(
+				props.editingId,
+				name,
+				description,
+				priority,
+				date
+			);
 			DBManager.getInstance().autoSave();
 			props.handleClose();
 			return;
@@ -299,13 +339,31 @@ export function CreateBugReportModal(props) {
 		props.handleClose();
 	}
 
+	// when the user clicks the delete button, delete the bug report
+	function deleteReport() {
+		DBManager.getInstance().deleteBugReport(props.editingId);
+		DBManager.getInstance().autoSave();
+		props.handleClose();
+	}
+
+	// when the user clicks the download button, download the bug report
+	function downloadReport() {
+		var date = new Date();
+		var br = new BugReportData(name, description, priority, date);
+		br.download();
+	}
+
 	useEffect(() => {
+		// when editingId is -1, the user is creating a new bug report
 		if (props.editingId == -1) {
 			setName("");
 			setDescription("");
 			setPriority(10);
 			return;
 		}
+
+		// otherwise, the user is editing an existing bug report
+		// so we need to set the name, description, and priority to the values of the bug report
 		console.log("editing");
 		var report = DBManager.getInstance().getBugReport(props.editingId);
 		console.log(report);
@@ -349,16 +407,25 @@ export function CreateBugReportModal(props) {
 					onChange={(e) => {
 						setPriority(e.target.value);
 					}}
-
 				>
 					<option value={10}>Low</option>
 					<option value={20}>Medium</option>
 					<option value={30}>High</option>
 				</Select>
 				<br />
-				<Button onClick={createReport} variant="contained">
-					Submit
-				</Button>
+				<div className="flex-row">
+					<Button onClick={createReport} variant="contained">
+						Submit
+					</Button>
+					<Button onClick={downloadReport} variant="contained" color="warning">
+						Download
+					</Button>
+					{props.editingId == -1 ? null : (
+						<Button onClick={deleteReport} variant="contained" color="error">
+							Delete
+						</Button>
+					)}
+				</div>
 			</div>
 		</Modal>
 	);

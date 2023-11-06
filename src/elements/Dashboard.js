@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { logOut } from "./Auth";
-import BugReport, { CreateBugReportModal, FakeBugReport } from "./BugReport";
+import BugReport, { BugReportData, CreateBugReportModal, FakeBugReport } from "./BugReport";
 import DBManager from "./DBManager";
 
 export default function Dashboard(props) {
@@ -215,6 +215,15 @@ export default function Dashboard(props) {
 					}}
 				>
 					Create Report
+				</Button>
+				<Button
+					variant="contained"
+					onClick={() => {
+						BugReportData.upload(() => {refresh(sortMethod)});
+						// refresh(sortMethod);
+					}}
+				>
+					Upload
 				</Button>
 				<Button
 					variant="contained"

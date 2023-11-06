@@ -52,11 +52,12 @@ class DBManager {
         this.autoSave();
     }
 
-	editBugReport(id, name, description, priority) {
+	editBugReport(id, name, description, priority, date) {
 		var br = this.reports[id];
 		br.name = name;
 		br.description = description;
 		br.priority = priority;
+		br.date = date;
 		
 		if (this.todo[id]) {
 			this.todo[id] = br;
