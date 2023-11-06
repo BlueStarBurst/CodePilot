@@ -52,6 +52,23 @@ class DBManager {
         this.autoSave();
     }
 
+	editBugReport(id, name, description, priority) {
+		var br = this.reports[id];
+		br.name = name;
+		br.description = description;
+		br.priority = priority;
+		
+		if (this.todo[id]) {
+			this.todo[id] = br;
+		} else if (this.inprog[id]) {
+			this.inprog[id] = br;
+		} else if (this.done[id]) {
+			this.done[id] = br;
+		}
+		this.reports[id] = br;
+		this.autoSave();
+	}	
+
 	getFromStorage(key) {
 		try {
 			return JSON.parse(this.db.getItem(key));

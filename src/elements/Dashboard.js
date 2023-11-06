@@ -26,9 +26,11 @@ export default function Dashboard(props) {
 	const [completed, setCompleted] = useState([]);
 
 	const [sortMethod, setSortMethod] = useState(0);
+	const [editingId, setEditingId] = useState(-1);
 
 	function handleClose() {
 		setOpen(false);
+		setEditingId(-1);
 		refresh(sortMethod);
 	}
 
@@ -54,6 +56,7 @@ export default function Dashboard(props) {
 	const [dragging, setDragging] = useState(false);
 	const [mouseCol, setMouseCol] = useState(0);
 	const [bugId, setBugId] = useState(0);
+	
 
 	function moveBR(col) {
 		DBManager.instance.moveBugReport(bugId, col);
@@ -61,12 +64,17 @@ export default function Dashboard(props) {
 		refresh(sortMethod);
 	}
 
+	useEffect(() => {
+		if (editingId == -1) return;
+		setOpen(true);
+	}, [editingId]);
+
 	return (
 		<>
 			<br />
 			<h1>Dashboard</h1>
 
-			<CreateBugReportModal open={open} handleClose={handleClose} />
+			<CreateBugReportModal open={open} handleClose={handleClose} editingId={editingId} />
 
 			<div className="flex-row">
 				<Button variant="contained" onClick={() => refresh(2)}>
@@ -101,6 +109,7 @@ export default function Dashboard(props) {
 									setMousePos={setMousePos}
 									bugRep={br}
 									setBugId={setBugId}
+									setEditingId={setEditingId}
 								/>
 							</React.Fragment>
 						))}
@@ -136,6 +145,7 @@ export default function Dashboard(props) {
 									setMousePos={setMousePos}
 									bugRep={br}
 									setBugId={setBugId}
+									setEditingId={setEditingId}
 								/>
 							</React.Fragment>
 						))}
@@ -171,6 +181,7 @@ export default function Dashboard(props) {
 									setMousePos={setMousePos}
 									bugRep={br}
 									setBugId={setBugId}
+									setEditingId={setEditingId}
 								/>
 							</React.Fragment>
 						))}
@@ -199,6 +210,7 @@ export default function Dashboard(props) {
 				<Button
 					variant="contained"
 					onClick={() => {
+						setEditingId(-1);
 						setOpen(true);
 					}}
 				>

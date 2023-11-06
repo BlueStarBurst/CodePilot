@@ -13,7 +13,7 @@ html {
   font-family: 'Roboto', sans-serif;
 }
 
-p {
+p, h5 {
   margin: 0rem !important;
 }
 
@@ -74,6 +74,7 @@ p {
   justify-content: center;
   align-items: flex-start;
   height: max-content;
+  min-height: 200px;
 }
 
 
@@ -82,6 +83,7 @@ p {
   width: 33.3% !important;
   justify-content: center;
   align-items: flex-start;
+  min-height: 200px;
 }
 
 .absReport {
@@ -158,6 +160,9 @@ p {
   border-radius: 5px;
   cursor: grab;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 td {
@@ -178,4 +183,24 @@ td {
   align-items: center;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+.flex-bug-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 0.5rem 0;
+  width: 100%;
+}
+
+.edit {
+  cursor: pointer;
+  color: #ffffffbc;
+  transition: all 0.5s ease;
+}
+
+.edit:hover {
+  color: #fff;
 }

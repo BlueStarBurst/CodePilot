@@ -8,17 +8,22 @@ import {
 } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import DBManager from "./DBManager";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencil } from "@fortawesome/free-solid-svg-icons";
 
+// BRYANT HARGREAVES
 export class BugReportData {
 	constructor(name, description, priority, date, id = 0) {
-		this.name = name;
-		this.description = description;
-		this.priority = priority;
-		this.date = date;
-		this.id = DBManager.instance.getBugReportID();
+		// id is optional
+		this.name = name; // name of the bug report
+		this.description = description; // description of the bug report
+		this.priority = priority; // priority of the bug report
+		this.date = date; // date of the bug report
+		this.id = DBManager.instance.getBugReportID(); // unique id of the bug report
 	}
 
 	static fromJSON(json) {
+		// Used for loading from local storage
 		return new BugReportData(
 			json.name,
 			json.description,
@@ -29,6 +34,7 @@ export class BugReportData {
 	}
 
 	toJSON() {
+		// Used for saving to local storage
 		return {
 			name: this.name,
 			description: this.description,
@@ -36,6 +42,19 @@ export class BugReportData {
 			date: this.date,
 			id: this.id,
 		};
+	}
+
+	download() {
+		// Used for downloading the bug report
+		var dataStr =
+			"data:text/json;charset=utf-8," +
+			encodeURIComponent(JSON.stringify(this.toJSON()));
+		var downloadAnchorNode = document.createElement("a");
+		downloadAnchorNode.setAttribute("href", dataStr);
+		downloadAnchorNode.setAttribute("download", "bugReport.json");
+		document.body.appendChild(downloadAnchorNode); // required for firefox
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
 	}
 }
 
@@ -101,6 +120,8 @@ export default function BugReport(props) {
 	const orig = useRef(null);
 
 	useEffect(() => {
+		// set the height and width variables using the original element
+		// this is so that the element doesn't change size when it is being dragged
 		if (orig.current == null) return;
 		setHeight(orig.current.offsetHeight);
 		setWidth(orig.current.offsetWidth);
@@ -110,6 +131,9 @@ export default function BugReport(props) {
 	}, [orig.current]);
 
 	useEffect(() => {
+		// set the name, description, priority, and date variables
+		// this is so that the element can display the correct information
+		// and change when the bug report is updated
 		var bugRep = props.bugRep;
 		setName(bugRep.name);
 		setDescription(bugRep.description);
@@ -120,6 +144,7 @@ export default function BugReport(props) {
 
 	useEffect(() => {
 		if (isDragging) {
+			// if the element is being dragged, set the position and size of the element to the mouse position
 			drag.current.style.width = width + "px";
 			drag.current.style.height = height + "px";
 			drag.current.style.left =
@@ -127,13 +152,33 @@ export default function BugReport(props) {
 			drag.current.style.top =
 				startPos.y - drag.current.offsetHeight / 2 + "px";
 		} else if (width != 0 && height != 0) {
+			// otherwise fix the width and height of the element
 			orig.current.style.width = width + "px !important";
 			orig.current.style.height = height + "px !important";
 			console.log("set orig");
 		}
 	}, [isDragging]);
 
+	function detectLeftButton(event) {
+		if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+			return false;
+		} else if ('buttons' in event) {
+			return event.buttons === 1;
+		} else if ('which' in event) {
+			return event.which === 1;
+		} else {
+			return (event.button == 1 || event.type == 'click');
+		}
+	}
+	// when the user starts dragging the element, set the start position and set isDragging to true
 	function startDrag(e) {
+		// make sure target is not custom edit button
+		if (e.target.id == "custom") return;
+		if (e.currentTarget.id == "custom") return;
+		console.log(e.target);
+		console.log(e.currentTarget);
+
+		if (detectLeftButton(e) == false) return;
 		e.preventDefault();
 		setIsDragging(true);
 		props.setBugId(id);
@@ -142,6 +187,7 @@ export default function BugReport(props) {
 		setStartPos({ x: e.clientX, y: e.clientY });
 	}
 
+	// when the user stops dragging the element, set isDragging to false
 	function endDrag() {
 		if (isDragging) {
 			drag.current.style.width = width + "px !important";
@@ -150,13 +196,11 @@ export default function BugReport(props) {
 			props.setDragging(false);
 		}
 		console.log("end drag");
-
-		// orig.current.style.width = width + "px";
-		// orig.current.style.height = height + "px";
 	}
 
 	const [close, setClose] = useState(false);
 
+	// when the user moves the mouse, update the position of the element
 	function mouseMove(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -177,10 +221,17 @@ export default function BugReport(props) {
 		}
 	}
 
+	function edit(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		props.setEditingId(id);
+	}
+
 	return (
 		<TableRow
-			onMouseDown={startDrag}
+			// onMouseDown={startDrag}
 			onMouseUp={endDrag}
+			onMouseDown={startDrag}
 			onMouseMove={mouseMove}
 			onMouseLeave={endDrag}
 			className={close || !isDragging ? "close" : "far"}
@@ -189,13 +240,20 @@ export default function BugReport(props) {
 				{isDragging ? (
 					<>
 						<div className="absReport report" ref={drag}>
-							<h5>{name}</h5>
+							<div className="flex-bug-head">
+								<h5>{name}</h5>
+								<p>edit</p>
+							</div>
+
 							<p>{description}</p>
 							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
 						</div>
 						<div className={close ? "otherReport report" : "fakeReport report"}>
-							<h5>{name}</h5>
+							<div className="flex-bug-head">
+								<h5>{name}</h5>
+								<p>edit</p>
+							</div>
 							<p>{description}</p>
 							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
@@ -204,7 +262,10 @@ export default function BugReport(props) {
 				) : (
 					<>
 						<div className="trueReport report" unselectable="true" ref={orig}>
-							<h5>{name}</h5>
+							<div className="flex-bug-head">
+								<h5>{name}</h5>
+								<p onClick={edit} id="custom" className="edit"><FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} /></p>
+							</div>
 							<p>{description}</p>
 							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
 							<p>{date}</p>
@@ -222,6 +283,13 @@ export function CreateBugReportModal(props) {
 	const [priority, setPriority] = useState("");
 
 	function createReport() {
+		if (props.editingId != -1) {
+			DBManager.getInstance().editBugReport(props.editingId, name, description, priority);
+			DBManager.getInstance().autoSave();
+			props.handleClose();
+			return;
+		}
+
 		var date = new Date();
 		var report = new BugReportData(name, description, priority, date);
 
@@ -230,6 +298,21 @@ export function CreateBugReportModal(props) {
 		console.log(report);
 		props.handleClose();
 	}
+
+	useEffect(() => {
+		if (props.editingId == -1) {
+			setName("");
+			setDescription("");
+			setPriority(10);
+			return;
+		}
+		console.log("editing");
+		var report = DBManager.getInstance().getBugReport(props.editingId);
+		console.log(report);
+		setName(report.name);
+		setDescription(report.description);
+		setPriority(report.priority);
+	}, [props.editingId]);
 
 	return (
 		<Modal open={props.open} onClose={props.handleClose}>
@@ -245,6 +328,7 @@ export function CreateBugReportModal(props) {
 					onChange={(e) => {
 						setName(e.target.value);
 					}}
+					value={name}
 				/>
 				<p>Description</p>
 				<TextField
@@ -256,6 +340,7 @@ export function CreateBugReportModal(props) {
 					onChange={(e) => {
 						setDescription(e.target.value);
 					}}
+					value={description}
 				/>
 				<p>Priority</p>
 				<Select
@@ -264,6 +349,7 @@ export function CreateBugReportModal(props) {
 					onChange={(e) => {
 						setPriority(e.target.value);
 					}}
+
 				>
 					<option value={10}>Low</option>
 					<option value={20}>Medium</option>
