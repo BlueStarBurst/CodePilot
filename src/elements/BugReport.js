@@ -21,6 +21,7 @@ export class BugReportData {
 		this.date = date; // date of the bug report
 		this.id = DBManager.instance.getBugReportID(); // unique id of the bug report
 		this.customMetrics = []; // Array to store custom metrics
+		this.deadline = null; // Add a deadline property
 	}
 
 	static fromJSON(json) {
@@ -85,7 +86,9 @@ export class BugReportData {
 		input.click();
 	}
 
-	
+	setDeadline(date) {
+		this.deadline = date;
+	  }
 }
 
 // BRYANT HARGREAVES
@@ -260,6 +263,19 @@ export default function BugReport(props) {
 		props.setEditingId(id);
 	}
 
+	<div className="trueReport report" unselectable="true" ref={orig}>
+  <div className="flex-bug-head">
+    <h5>{name}</h5>
+    <p onClick={edit} id="custom" className="edit">
+      <FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} />
+    </p>
+  </div>
+  <p>{description}</p>
+  <p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
+  {deadline && <span className="deadline-tag">Deadline: {deadline}</span>}
+  <p>{date}</p>
+</div>
+
 	return (
 		<TableRow
 			// onMouseDown={startDrag}
@@ -375,6 +391,17 @@ export function CreateBugReportModal(props) {
 		setPriority(report.priority);
 	}, [props.editingId]);
 
+	<TextField
+  id="outlined-basic"
+  label="Deadline"
+  type="date"
+  variant="outlined"
+  onChange={(e) => {
+    setDeadline(e.target.value);
+  }}
+  value={deadline}
+/>
+
 	return (
 		<Modal open={props.open} onClose={props.handleClose}>
 			<div className="bugModal">
@@ -434,7 +461,7 @@ export function CreateBugReportModal(props) {
 	);
 }
 
-
+//Neilish(delete if needed)
 class CustomMetric {
 	constructor(name, description, type) {
 	  this.name = name;
@@ -460,6 +487,8 @@ class CustomMetric {
 	  this.customMetrics.splice(index, 1);
 	}
 };
+
+
 
   
 
