@@ -334,6 +334,7 @@ export function CreateBugReportModal(props) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [priority, setPriority] = useState("");
+	const [deadline, setDeadline] = useState("");
 
 	// when the user clicks the submit button, create the bug report
 	function createReport() {
