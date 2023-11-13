@@ -1,5 +1,7 @@
 # CodePilot
 
+The website is also publicly available [here](https://bluestarburst.github.io/CodePilot/) 
+
 How to use test the website:
 
 1. Download NPM [here](https://nodejs.org/en/download)
