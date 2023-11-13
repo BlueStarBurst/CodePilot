@@ -145,6 +145,7 @@ export default function BugReport(props) {
 	const [priority, setPriority] = useState("");
 	const [date, setDate] = useState("");
 	const [id, setId] = useState(0);
+	const [deadline, setDeadline] = useState("");
 
 	const [height, setHeight] = useState(0);
 	const [width, setWidth] = useState(0);
