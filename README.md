@@ -2,7 +2,7 @@
 
 The website is also publicly available [here](https://bluestarburst.github.io/CodePilot/) 
 
-How to use test the website:
+How to build the website from source:
 
 1. Download NPM [here](https://nodejs.org/en/download)
 2. Download git [here](https://github.com/git-guides/install-git)
