@@ -22,6 +22,11 @@ import Login from "./elements/Login";
 import Dashboard from "./elements/Dashboard";
 import CreateProfile from "./elements/CreateProfile";
 
+import {
+	experimental_extendTheme as extendTheme,
+	Experimental_CssVarsProvider as CssVarsProvider,
+} from "@mui/material/styles";
+
 const darkTheme = createTheme({
 	palette: {
 		mode: "dark",
@@ -51,8 +56,7 @@ function TestClass(props) {
 			// Check if the user has a profile, and if not, set hasProfile to false
 			if (!hasProfile) {
 				setHasProfile(false);
-			} 
-			else {
+			} else {
 				setHasProfile(true);
 			}
 		} else {
@@ -66,20 +70,26 @@ function TestClass(props) {
 		setUserProfile(profileData);
 
 		//Set hasProfile to true once the user creates a profile
-		setHasProfile(true); 
+		setHasProfile(true);
 	};
 
 	return (
 		<ThemeProvider theme={theme}>
+			{/* <CssVarsProvider theme={theme} > */}
 			<CssBaseline />
 			<div className="flex-page">
-				{isSignedIn ? (hasProfile ? (
-					<Dashboard userProfile = {userProfile} />
+				{isSignedIn ? (
+					hasProfile ? (
+						<Dashboard userProfile={userProfile} />
+					) : (
+						<CreateProfile onProfileSubmit={handleProfileSubmit} />
+					)
 				) : (
-					<CreateProfile onProfileSubmit = {handleProfileSubmit} />
-				)) : <Login />}
+					<Login />
+				)}
 				<Auth setAuthState={setAuthState} />
 			</div>
+			{/* </CssVarsProvider> */}
 		</ThemeProvider>
 	);
 }
@@ -87,5 +97,5 @@ function TestClass(props) {
 render(<TestClass />, document.getElementById("root"));
 
 document.addEventListener("dragover", (event) => {
-    event.preventDefault();
+	event.preventDefault();
 });

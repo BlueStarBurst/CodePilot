@@ -212,3 +212,21 @@ td {
   border-radius: 4px;
   margin-left: 10px;
 }
+
+.MuiInputBase-colorPrimary .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(173, 216, 230, 0.538) !important;
+  color: lightblue !important;
+}
+
+.MuiInputBase-colorPrimary .MuiOutlinedInput-notchedOutline:hover {
+  border-color: rgb(173, 216, 230) !important;
+  color: lightblue !important;
+}
+
+.MuiInputBase-colorPrimary div, .MuiInputBase-colorPrimary svg {
+  color: lightblue !important;
+}
+
+.MuiFormLabel-colorPrimary {
+  color: lightblue !important;
+}
