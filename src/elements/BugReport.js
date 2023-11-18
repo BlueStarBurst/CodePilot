@@ -46,6 +46,23 @@ export class BugReportData {
 		};
 	}
 
+	addCustomMetric(name, description, type) {
+	  this.customMetrics.push(new CustomMetric(name, description, type));
+	}
+  
+	updateCustomMetric(index, name, description, type) {
+	  const metric = this.customMetrics[index];
+	  if (metric) {
+		metric.name = name;
+		metric.description = description;
+		metric.type = type;
+	  }
+	}
+  
+	deleteCustomMetric(index) {
+	  this.customMetrics.splice(index, 1);
+	}
+
 	download() {
 		// Used for downloading the bug report
 		var dataStr =
@@ -470,23 +487,6 @@ class CustomMetric {
 	  this.description = description;
 	  this.type = type; // e.g., 'text', 'number', 'date'
 	  this.value = null; // You can set the value as needed
-	}
-  
-	addCustomMetric(name, description, type) {
-	  this.customMetrics.push(new CustomMetric(name, description, type));
-	}
-  
-	updateCustomMetric(index, name, description, type) {
-	  const metric = this.customMetrics[index];
-	  if (metric) {
-		metric.name = name;
-		metric.description = description;
-		metric.type = type;
-	  }
-	}
-  
-	deleteCustomMetric(index) {
-	  this.customMetrics.splice(index, 1);
 	}
 };
 
