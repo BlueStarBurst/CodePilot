@@ -3,8 +3,6 @@ import { Button } from "@mui/material";
 import React from "react";
 import { isUserSignedIn, signInWithGoogle } from "./Auth";
 import logo from "../logo_transparent.png";
-import SignUpWithEmail from "./SignUpWithEmail";
-import SignIn from "./SignIn";
 
 export default function Login(props) {
 	return (
@@ -30,19 +28,9 @@ export default function Login(props) {
 				
 			>
 				Sign in with Google
-
+				
 			</Button>
-
-			<br />
-			<Button variant = "contained" onClick = {SignUpWithEmail}>
-                Sign Up
-            </Button>
-			<br />
-			<Button variant = "contained" onClick = {SignIn}>
-                Sign In
-            </Button>
 			</div>
 		</>
 	);
 }
-

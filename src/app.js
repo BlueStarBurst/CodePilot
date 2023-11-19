@@ -21,8 +21,6 @@ import { Button, ThemeProvider, createTheme } from "@mui/material";
 import Login from "./elements/Login";
 import Dashboard from "./elements/Dashboard";
 import CreateProfile from "./elements/CreateProfile";
-import SignUpWithEmail from "./elements/SignUpWithEmail";
-import SignIn from "./elements/SignIn";
 
 const darkTheme = createTheme({
 	palette: {
