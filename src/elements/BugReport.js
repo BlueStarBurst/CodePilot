@@ -480,16 +480,6 @@ export function CreateBugReportModal(props) {
 	);
 }
 
-//Neilish(delete if needed)
-class CustomMetric {
-	constructor(name, description, type) {
-	  this.name = name;
-	  this.description = description;
-	  this.type = type; // e.g., 'text', 'number', 'date'
-	  this.value = null; // You can set the value as needed
-	}
-};
-
 
 
   
