@@ -504,11 +504,11 @@ export function CreateBugReportModal(props) {
 							Delete
 						</Button>
 					)}
-					{props.editingId == -1 ? null : (
+					
 					<Button onClick={cloneReport} variant="contained">
 						Clone
 					</Button>
-					)}
+					
 				</div>
 			</div>
 		</Modal>
