@@ -391,6 +391,38 @@ export function CreateBugReportModal(props) {
 		br.download();
 	}
 
+	// Neilish Code - when the user clicks the clone button, clone current bug report
+	function cloneReport() {
+		console.log("editing");
+		var report = DBManager.getInstance().getBugReport(props.editingId);
+		console.log(report);
+		setName(report.name);
+		setDescription(report.description);
+		setPriority(report.priority);
+	}, [props.editingId]);
+	
+		
+		DBManager.getInstance().editBugReport(
+			props.editingId,
+			name,
+			description,
+			priority,
+			date
+		);
+		DBManager.getInstance().autoSave();
+		props.handleClose();
+		return;
+		
+
+		var date = new Date();
+		var report = new BugReportData(name, description, priority, date);
+
+		DBManager.getInstance().createBugReport(name, description, priority);
+		DBManager.getInstance().autoSave();
+		console.log(report);
+		props.handleClose();
+	}
+
 	useEffect(() => {
 		// when editingId is -1, the user is creating a new bug report
 		if (props.editingId == -1) {
@@ -472,6 +504,11 @@ export function CreateBugReportModal(props) {
 					{props.editingId == -1 ? null : (
 						<Button onClick={deleteReport} variant="contained" color="error">
 							Delete
+						</Button>
+					)}	
+					{props.editingId == -1 ? null : (
+						<Button onClick={cloneReport} variant="contained">
+							Clone
 						</Button>
 					)}
 				</div>
