@@ -1,6 +1,10 @@
 import {
+	Box,
 	Button,
+	Chip,
+	MenuItem,
 	Modal,
+	OutlinedInput,
 	Select,
 	TableCell,
 	TableRow,
@@ -10,15 +14,19 @@ import React, { useState, useEffect, useRef } from "react";
 import DBManager from "./DBManager";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
+import { ErrorTextField, Tag } from "./Misc";
+
+const isMobile = window.innerWidth < 600;
 
 // BRYANT HARGREAVES
 export class BugReportData {
-	constructor(name, description, priority, date, id = 0) {
+	constructor(name, description, priority, tags, date, id = 0) {
 		// id is optional
 		this.name = name; // name of the bug report
 		this.description = description; // description of the bug report
 		this.priority = priority; // priority of the bug report
 		this.date = date; // date of the bug report
+		this.tags = tags; // tags of the bug report
 		this.id = DBManager.instance.getBugReportID(); // unique id of the bug report
 		this.customMetrics = []; // Array to store custom metrics
 		this.deadline = null; // Add a deadline property
@@ -30,6 +38,7 @@ export class BugReportData {
 			json.name,
 			json.description,
 			json.priority,
+			json.tags,
 			json.date,
 			json.id
 		);
@@ -41,26 +50,27 @@ export class BugReportData {
 			name: this.name,
 			description: this.description,
 			priority: this.priority,
+			tags: this.tags,
 			date: this.date,
 			id: this.id,
 		};
 	}
 
 	addCustomMetric(name, description, type) {
-	  this.customMetrics.push(new CustomMetric(name, description, type));
+		this.customMetrics.push(new CustomMetric(name, description, type));
 	}
-  
+
 	updateCustomMetric(index, name, description, type) {
-	  const metric = this.customMetrics[index];
-	  if (metric) {
-		metric.name = name;
-		metric.description = description;
-		metric.type = type;
-	  }
+		const metric = this.customMetrics[index];
+		if (metric) {
+			metric.name = name;
+			metric.description = description;
+			metric.type = type;
+		}
 	}
-  
+
 	deleteCustomMetric(index) {
-	  this.customMetrics.splice(index, 1);
+		this.customMetrics.splice(index, 1);
 	}
 
 	download() {
@@ -93,6 +103,7 @@ export class BugReportData {
 					report.name,
 					report.description,
 					report.priority,
+					report.tags,
 					report.date
 				);
 				DBManager.getInstance().autoSave();
@@ -105,7 +116,7 @@ export class BugReportData {
 
 	setDeadline(date) {
 		this.deadline = date;
-	  }
+	}
 }
 
 // BRYANT HARGREAVES
@@ -131,14 +142,14 @@ export function FakeBugReport(props) {
 			var left =
 				ref.current.getBoundingClientRect().left + ref.current.offsetWidth / 2;
 			var top =
-				ref.current.getBoundingClientRect().top + ref.current.offsetHeight;
+				ref.current.getBoundingClientRect().top + ref.current.offsetHeight / 2;
 			// if pos is within 150px of mousePos, set close to true
 			var dist = Math.sqrt(
 				Math.pow(props.mousePos.x - left, 2) +
 					Math.pow(props.mousePos.y - top, 2)
 			);
 
-			if (dist < 100) {
+			if (dist < 100 || dist < ref.current.offsetHeight / 2) {
 				console.log("CLOSE");
 				setClose(true);
 			} else {
@@ -148,13 +159,21 @@ export function FakeBugReport(props) {
 	}, [props.mousePos, props.dragging, props.mouseCol]);
 
 	return (
-		<TableRow ref={ref}>
-			<div className={close ? "fakeClose" : "fakeFar"}></div>
-		</TableRow>
+		<>
+			{props.full && props.mouseCol == props.col ? null : (
+				<TableRow ref={ref} className={props.full ? "fulltr" : ""}>
+					{props.full == true ? (
+						<div className={close ? "fullClose" : "fullFar"}></div>
+					) : (
+						<div className={close ? "fakeClose" : "fakeFar"}></div>
+					)}
+				</TableRow>
+			)}
+		</>
 	);
 }
 
-
+var timeout = null;
 // BRYANT HARGREAVES
 export default function BugReport(props) {
 	const [name, setName] = useState("");
@@ -162,6 +181,7 @@ export default function BugReport(props) {
 	const [priority, setPriority] = useState("");
 	const [date, setDate] = useState("");
 	const [id, setId] = useState(0);
+	const [tags, setTags] = useState([]);
 	const [deadline, setDeadline] = useState("");
 
 	const [height, setHeight] = useState(0);
@@ -193,6 +213,7 @@ export default function BugReport(props) {
 		setDescription(bugRep.description);
 		setPriority(bugRep.priority);
 		setDate(new Date(bugRep.date).toDateString());
+		setTags(bugRep.tags);
 		setId(bugRep.id);
 	}, [props.bugRep]);
 
@@ -224,13 +245,25 @@ export default function BugReport(props) {
 			return event.button == 1 || event.type == "click";
 		}
 	}
+
+	function checkDrag(e) {
+		console.log("check drag");
+		clearTimeout(timeout);
+		setStartPos({ x: e.clientX, y: e.clientY });
+		timeout = setTimeout(() => {
+			startDrag(e);
+			timeout = null;
+		}, 100);
+	}
+
 	// when the user starts dragging the element, set the start position and set isDragging to true
 	function startDrag(e) {
+		console.log("start drag");
 		// make sure target is not custom edit button
 		if (e.target.id == "custom") return;
-		if (e.currentTarget.id == "custom") return;
+		// if (e.currentTarget.id == "custom") return;
 		console.log(e.target);
-		console.log(e.currentTarget);
+		// console.log(e.currentTarget);
 
 		if (detectLeftButton(e) == false) return;
 		e.preventDefault();
@@ -241,8 +274,18 @@ export default function BugReport(props) {
 		setStartPos({ x: e.clientX, y: e.clientY });
 	}
 
+	const [isSelected, setIsSelected] = useState(false);
+	useEffect(() => {
+		setIsSelected(props.selectedReport == id);
+	}, [props.selectedReport]);
+
 	// when the user stops dragging the element, set isDragging to false
 	function endDrag() {
+		if (timeout != null) {
+			clearTimeout(timeout);
+			timeout = null;
+		}
+		props.setSelectedReport(id);
 		if (isDragging) {
 			drag.current.style.width = width + "px !important";
 			drag.current.style.height = height + "px !important";
@@ -256,8 +299,8 @@ export default function BugReport(props) {
 
 	// when the user moves the mouse, update the position of the element
 	function mouseMove(e) {
-		e.preventDefault();
-		e.stopPropagation();
+		// e.preventDefault();
+		// e.stopPropagation();
 		if (isDragging) {
 			console.log("dragging");
 			drag.current.style.left = e.clientX - drag.current.offsetWidth / 2 + "px";
@@ -275,32 +318,41 @@ export default function BugReport(props) {
 		}
 	}
 
+	function tapMove(e) {
+		if (isDragging) {
+			console.log("dragging");
+			drag.current.style.left =
+				e.touches[0].clientX - drag.current.offsetWidth / 2 + "px";
+			drag.current.style.top =
+				e.touches[0].clientY - drag.current.offsetHeight / 2 + "px";
+			props.setMousePos({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+			var dist = Math.sqrt(
+				Math.pow(e.touches[0].clientX - startPos.x, 2) +
+					Math.pow(e.touches[0].clientY - startPos.y, 2)
+			);
+			if (dist < 150) {
+				setClose(true);
+			} else {
+				setClose(false);
+			}
+		}
+	}
+
 	function edit(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		props.setEditingId(id);
 	}
 
-	<div className="trueReport report" unselectable="true" ref={orig}>
-  <div className="flex-bug-head">
-    <h5>{name}</h5>
-    <p onClick={edit} id="custom" className="edit">
-      <FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} />
-    </p>
-  </div>
-  <p>{description}</p>
-  <p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
-  {deadline && <span className="deadline-tag">Deadline: {deadline}</span>}
-  <p>{date}</p>
-</div>
-
 	return (
 		<TableRow
 			// onMouseDown={startDrag}
 			onMouseUp={endDrag}
-			onMouseDown={startDrag}
+			onMouseDown={checkDrag}
 			onMouseMove={mouseMove}
-			onMouseLeave={endDrag}
+			onTouchStart={checkDrag}
+			onTouchMove={tapMove}
+			// onMouseLeave={endDrag}
 			className={close || !isDragging ? "close" : "far"}
 		>
 			<TableCell>
@@ -309,34 +361,77 @@ export default function BugReport(props) {
 						<div className="absReport report" ref={drag}>
 							<div className="flex-bug-head">
 								<h5>{name}</h5>
-								<p>edit</p>
+								<p onClick={edit} id="custom" className="edit">
+									<FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} />
+								</p>
 							</div>
-
+							{tags.length == 0 ? null : (
+								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+									{tags.map((tag) => {
+										return <Chip key={tag} label={tag} />;
+									})}
+								</Box>
+							)}
 							<p>{description}</p>
-							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
+							<p
+								className={
+									priority == 30 ? "high" : priority == 20 ? "med" : "low"
+								}
+							>
+								{priority == 30 ? "• • •" : priority == 20 ? "• •" : "•"}
+							</p>
 							<p>{date}</p>
 						</div>
 						<div className={close ? "otherReport report" : "fakeReport report"}>
 							<div className="flex-bug-head">
 								<h5>{name}</h5>
-								<p>edit</p>
+								<p onClick={edit} id="custom" className="edit">
+									<FontAwesomeIcon
+										color="transparent"
+										onClick={edit}
+										id="custom"
+										icon={faPencil}
+									/>
+								</p>
 							</div>
 							<p>{description}</p>
-							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
+							<p>{priority == 30 ? "• • •" : priority == 20 ? "• •" : "•"}</p>
 							<p>{date}</p>
 						</div>
 					</>
 				) : (
 					<>
-						<div className="trueReport report" unselectable="true" ref={orig}>
+						<div
+							className={
+								isSelected
+									? "trueReport report selectedReport"
+									: "trueReport report"
+							}
+							unselectable="true"
+							ref={orig}
+						>
 							<div className="flex-bug-head">
 								<h5>{name}</h5>
 								<p onClick={edit} id="custom" className="edit">
 									<FontAwesomeIcon onClick={edit} id="custom" icon={faPencil} />
 								</p>
 							</div>
+							{tags.length == 0 ? null : (
+								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+									{tags.map((tag) => {
+										return <Chip key={tag} label={tag} />;
+									})}
+								</Box>
+							)}
+
 							<p>{description}</p>
-							<p>{priority == 30 ? "High" : priority == 20 ? "Med" : "Low"}</p>
+							<p
+								className={
+									priority == 30 ? "high" : priority == 20 ? "med" : "low"
+								}
+							>
+								{priority == 30 ? "• • •" : priority == 20 ? "• •" : "•"}
+							</p>
 							<p>{date}</p>
 						</div>
 					</>
@@ -346,21 +441,39 @@ export default function BugReport(props) {
 	);
 }
 
+var modalErrors = {};
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+	PaperProps: {
+		style: {
+			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+			width: 250,
+		},
+	},
+};
+
 // BRYANT HARGREAVES
 export function CreateBugReportModal(props) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [priority, setPriority] = useState("");
 	const [deadline, setDeadline] = useState("");
+	const [tags, setTags] = useState([]);
+
+	const [disabled, setDisabled] = useState(0);
 
 	// when the user clicks the submit button, create the bug report
 	function createReport() {
+		var date = new Date();
 		if (props.editingId != -1) {
 			DBManager.getInstance().editBugReport(
 				props.editingId,
 				name,
 				description,
 				priority,
+				tags,
 				date
 			);
 			DBManager.getInstance().autoSave();
@@ -368,10 +481,9 @@ export function CreateBugReportModal(props) {
 			return;
 		}
 
-		var date = new Date();
-		var report = new BugReportData(name, description, priority, date);
+		var report = new BugReportData(name, description, priority, tags, date);
 
-		DBManager.getInstance().createBugReport(name, description, priority);
+		DBManager.getInstance().createBugReport(name, description, priority, tags);
 		DBManager.getInstance().autoSave();
 		console.log(report);
 		props.handleClose();
@@ -387,37 +499,35 @@ export function CreateBugReportModal(props) {
 	// when the user clicks the download button, download the bug report
 	function downloadReport() {
 		var date = new Date();
-		var br = new BugReportData(name, description, priority, date);
+		var br = new BugReportData(name, description, priority, tags, date);
 		br.download();
 	}
-	// Neilish Code - when the user clicks the clone button, create a new bug report with current information 
+	// Neilish Code - when the user clicks the clone button, create a new bug report with current information
 	function cloneReport() {
+		// console.log("editing");
+		// var report = DBManager.getInstance().getBugReport(props.editingId);
+		// console.log(report);
+		// setName(report.name);
+		// setDescription(report.description);
+		// setPriority(report.priority);
 
-		console.log("editing");
-		var report = DBManager.getInstance().getBugReport(props.editingId);
-		console.log(report);
-		setName(report.name);
-		setDescription(report.description);
-		setPriority(report.priority);
-	
-	
-			DBManager.getInstance().editBugReport(
-				props.editingId,
-				name,
-				description,
-				priority,
-				date
-			);
-			DBManager.getInstance().autoSave();
-			props.handleClose();
-			return;		
+		// DBManager.getInstance().editBugReport(
+		// 	props.editingId,
+		// 	name,
+		// 	description,
+		// 	priority,
+		// 	date
+		// );
+		// DBManager.getInstance().autoSave();
+		// props.handleClose();
+		// return;
 
-		var date = new Date();
-		var report = new BugReportData(name, description, priority, date);
+		// var date = new Date();
+		// var report = new BugReportData(name, description, priority, date);
 
-		DBManager.getInstance().createBugReport(name, description, priority);
+		DBManager.getInstance().createBugReport(name, description, priority, tags);
 		DBManager.getInstance().autoSave();
-		console.log(report);
+		// console.log(report);
 		props.handleClose();
 	}
 
@@ -427,6 +537,7 @@ export function CreateBugReportModal(props) {
 			setName("");
 			setDescription("");
 			setPriority(10);
+			setTags([]);
 			return;
 		}
 
@@ -438,25 +549,44 @@ export function CreateBugReportModal(props) {
 		setName(report.name);
 		setDescription(report.description);
 		setPriority(report.priority);
+		setTags(report.tags);
 	}, [props.editingId]);
 
-	<TextField
-  id="outlined-basic"
-  label="Deadline"
-  type="date"
-  variant="outlined"
-  onChange={(e) => {
-    setDeadline(e.target.value);
-  }}
-  value={deadline}
-/>
+	// <TextField
+	// 	id="outlined-basic"
+	// 	label="Deadline"
+	// 	type="date"
+	// 	variant="outlined"
+	// 	onChange={(e) => {
+	// 		setDeadline(e.target.value);
+	// 	}}
+	// 	value={deadline}
+	// />;
+
+	function returnError(id, error) {
+		if (error) {
+			modalErrors[id] = true;
+			// get length of errors object
+			setDisabled(Object.keys(modalErrors).length > 0);
+			console.log(modalErrors);
+		} else {
+			// delete errors[id];
+			delete modalErrors[id];
+			setDisabled(Object.keys(modalErrors).length > 0);
+			console.log(modalErrors);
+		}
+	}
 
 	return (
 		<Modal open={props.open} onClose={props.handleClose}>
 			<div className="bugModal">
 				<h1>Report</h1>
 				<p>Name</p>
-				<TextField
+				<ErrorTextField
+					required
+					returnError={returnError}
+					minLength={2}
+					maxLength={20}
 					id="outlined-basic"
 					label="Name"
 					variant="outlined"
@@ -468,7 +598,11 @@ export function CreateBugReportModal(props) {
 					value={name}
 				/>
 				<p>Description</p>
-				<TextField
+				<ErrorTextField
+					required
+					returnError={returnError}
+					minLength={2}
+					maxLength={100}
 					id="outlined-multiline-static"
 					multiline
 					rows={4}
@@ -479,6 +613,37 @@ export function CreateBugReportModal(props) {
 					}}
 					value={description}
 				/>
+				<p>Tags</p>
+				<Select
+					multiple
+					value={tags}
+					onChange={(e) => {
+						console.log(e.target.value);
+						setTags(e.target.value);
+					}}
+					input={<OutlinedInput />}
+					MenuProps={MenuProps}
+					renderValue={(selected) => (
+						<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+							{selected.map((value) => (
+								<Chip key={value} label={value} />
+							))}
+						</Box>
+					)}
+				>
+					{[
+						"Front-End",
+						"Back-End",
+						"Cloud",
+						"Unknown",
+						"Suggestion",
+						"Critical",
+					].map((name) => (
+						<MenuItem key={name} value={name}>
+							{name}
+						</MenuItem>
+					))}
+				</Select>
 				<p>Priority</p>
 				<Select
 					native
@@ -493,30 +658,37 @@ export function CreateBugReportModal(props) {
 				</Select>
 				<br />
 				<div className="flex-row">
-					<Button onClick={createReport} variant="contained">
+					<Button
+						onClick={createReport}
+						variant="contained"
+						disabled={disabled}
+					>
 						Submit
 					</Button>
-					<Button onClick={downloadReport} variant="contained" color="warning">
+					<Button
+						onClick={downloadReport}
+						variant="contained"
+						color="warning"
+						disabled={disabled}
+					>
 						Download
 					</Button>
+					{props.editingId == -1 ? null : (
+						<Button
+							onClick={cloneReport}
+							variant="contained"
+							disabled={disabled}
+						>
+							Clone
+						</Button>
+					)}
 					{props.editingId == -1 ? null : (
 						<Button onClick={deleteReport} variant="contained" color="error">
 							Delete
 						</Button>
 					)}
-					
-					<Button onClick={cloneReport} variant="contained">
-						Clone
-					</Button>
-					
 				</div>
 			</div>
 		</Modal>
 	);
 }
-
-
-
-  
-
-

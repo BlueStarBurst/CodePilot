@@ -6,7 +6,7 @@ import {
 	signInWithRedirect,
 	GoogleAuthProvider,
 	getRedirectResult,
-    signInWithPopup,
+	signInWithPopup,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 // import { getFirestore } from "firebase/firestore";
@@ -39,13 +39,16 @@ export async function signInWithGoogle() {
 		return;
 	}
 	const provider = new GoogleAuthProvider();
+	provider.setCustomParameters({
+		prompt: "select_account",
+	});
 	// get redirect result
-    // Before
-    // ==============
-    const result = await signInWithRedirect(auth, provider);
-    const credential = await getRedirectResult(auth);
+	// Before
+	// ==============
+	const result = await signInWithRedirect(auth, provider);
+	const credential = await getRedirectResult(auth);
 
-    console.log(credential);
+	console.log(credential);
 	// After
 	// ==============
 	// const userCred2 = await signInWithPopup(auth, provider);

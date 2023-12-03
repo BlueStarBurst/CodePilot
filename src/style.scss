@@ -29,7 +29,7 @@ p, h5 {
   margin: auto;
   padding: 2rem;
   border-radius: 5px;
-  max-width: 350px;
+  max-width: 500px;
   animation: fadeIn 0.5s;
 }
 
@@ -73,17 +73,43 @@ p, h5 {
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  height: max-content;
+  height: min-content;
   min-height: 200px;
+  flex-grow: 1;
 }
-
-
 
 .bugTable table {
   width: 33.3% !important;
-  justify-content: center;
+  max-width: 33.3% !important;
+  justify-content: flex-start;
   align-items: flex-start;
   min-height: 200px;
+  height: 100%;
+}
+
+tbody {
+  min-height: 100px;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  display: flex !important;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+td {
+  display: flex !important;
+  border: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+tr {
+  padding: 0 !important;
+}
+
+.fulltr {
+  height: 100% !important;
 }
 
 .absReport {
@@ -98,20 +124,15 @@ p, h5 {
   background-color: transparent !important;
   height: 0;
   padding: 0 1rem 0 1rem !important;
-  transition: all 1s ease;
+  transition: height 1s ease, background-color 1s ease !important;
 }
 
 .otherReport {
   color: transparent !important;
-  background-color: transparent !important;
+  background-color: rgba(255, 255, 255, 0.072) !important;
   height: 100px;
   padding: 1rem 1rem;
-  transition: all 1s ease;
-}
-
-.far {
-  padding: 0 !important;
-  transition: all 1s ease;
+  transition: height 1s ease, background-color 1s ease !important;
 }
 
 .far td {
@@ -119,19 +140,36 @@ p, h5 {
   transition: all 1s ease;
 }
 
-.close {
-  padding: 1rem !important;
-  transition: all 1s ease;
-}
-
 .fakeClose {
   transition: all 1s ease;
   height: 100px;
+  background-color: rgba(255, 255, 255, 0.072);
+  border-radius: 5px;
+  padding: 1rem 2rem;
 }
 
 .fakeFar {
   height: 0;
   transition: all 1s ease;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 5px;
+  padding: 0rem;
+}
+
+.fullClose {
+  transition: all 1s ease;
+  height: 100% !important;
+  background-color: rgba(255, 255, 255, 0.072);
+  border-radius: 5px;
+  padding: 1rem 2rem !important;
+}
+
+.fullFar {
+  height: 100% !important;
+  transition: all 1s ease;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 5px;
+  padding: 0rem;
 }
 
 @keyframes shrink {
@@ -158,19 +196,24 @@ p, h5 {
   padding: 1rem;
   background-color: rgba(74, 74, 74, 0.411);
   border-radius: 5px;
-  cursor: grab;
+  cursor: pointer;
   width: 100%;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.5s ease;
   gap: 0.2rem;
 }
 
-td {
-  border: 0 !important;
-  padding: 0.5rem !important;
+.report p {
+  word-break:normal;
 }
 
-.report:active {
+.selectedReport {
+  transition: background-color 0.5s ease;
+  background-color: rgba(139, 139, 139, 0.411);
+}
+
+.absReport:active {
   cursor: grabbing;
   opacity: 1;
   z-index: 100;
@@ -183,6 +226,7 @@ td {
   align-items: center;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .flex-bug-head {
@@ -191,7 +235,7 @@ td {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0 0;
   width: 100%;
 }
 
@@ -199,10 +243,18 @@ td {
   cursor: pointer;
   color: #ffffffbc;
   transition: all 0.5s ease;
+  padding: 0.2rem;
+  border-radius: 100px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .edit:hover {
   color: #fff;
+  background-color: #ffffff11;
 }
 
 .deadline-tag {
@@ -213,20 +265,57 @@ td {
   margin-left: 10px;
 }
 
-.MuiInputBase-colorPrimary .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(173, 216, 230, 0.538) !important;
-  color: lightblue !important;
+.create-profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
 }
 
-.MuiInputBase-colorPrimary .MuiOutlinedInput-notchedOutline:hover {
-  border-color: rgb(173, 216, 230) !important;
-  color: lightblue !important;
+.login {
+  display: flex;
+  max-width: 100vw;
+  padding: 1rem;
 }
 
-.MuiInputBase-colorPrimary div, .MuiInputBase-colorPrimary svg {
-  color: lightblue !important;
+.high {
+  color: #ff3333;
 }
 
-.MuiFormLabel-colorPrimary {
-  color: lightblue !important;
+.med {
+  color: #ff9f33;
+}
+
+.low {
+  color: #33ff33;
+}
+
+@media only screen and (max-width: 600px) {
+  .bugTable {
+    flex-direction: column;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    margin-top: 1rem;
+  }
+
+  .bugTable table {
+    width: 100% !important;
+    max-width: 100% !important;
+    background-color: transparent !important;
+  }
+
+  th {
+    transform: translateY(-5px);
+  }
+  tbody {
+    transform: translateY(-5px);
+    background-color: var(--dark-color) !important;
+  }
 }
