@@ -464,6 +464,17 @@ export function CreateBugReportModal(props) {
 
 	const [disabled, setDisabled] = useState(0);
 
+	useEffect(() => {
+		modalErrors = {};
+	}, [props.open]);
+
+	function resetModal() {
+		setName("");
+		setDescription("");
+		setPriority(10);
+		setTags([]);
+	}
+
 	// when the user clicks the submit button, create the bug report
 	function createReport() {
 		var date = new Date();
@@ -477,7 +488,9 @@ export function CreateBugReportModal(props) {
 				date
 			);
 			DBManager.getInstance().autoSave();
+			resetModal();
 			props.handleClose();
+			
 			return;
 		}
 
@@ -486,6 +499,7 @@ export function CreateBugReportModal(props) {
 		DBManager.getInstance().createBugReport(name, description, priority, tags);
 		DBManager.getInstance().autoSave();
 		console.log(report);
+		resetModal();
 		props.handleClose();
 	}
 
@@ -493,6 +507,7 @@ export function CreateBugReportModal(props) {
 	function deleteReport() {
 		DBManager.getInstance().deleteBugReport(props.editingId);
 		DBManager.getInstance().autoSave();
+		resetModal();
 		props.handleClose();
 	}
 
@@ -527,6 +542,7 @@ export function CreateBugReportModal(props) {
 
 		DBManager.getInstance().createBugReport(name, description, priority, tags);
 		DBManager.getInstance().autoSave();
+		resetModal();
 		// console.log(report);
 		props.handleClose();
 	}

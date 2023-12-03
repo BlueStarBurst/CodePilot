@@ -13,7 +13,8 @@ html {
   font-family: 'Roboto', sans-serif;
 }
 
-p, h5 {
+p,
+h5 {
   margin: 0rem !important;
 }
 
@@ -37,6 +38,7 @@ p, h5 {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -75,7 +77,6 @@ p, h5 {
   align-items: flex-start;
   height: min-content;
   min-height: 200px;
-  flex-grow: 1;
 }
 
 .bugTable table {
@@ -177,6 +178,7 @@ tr {
     height: 100px;
     padding: 1rem;
   }
+
   to {
     height: 0;
     padding: 0;
@@ -202,10 +204,12 @@ tr {
   flex-direction: column;
   transition: background-color 0.5s ease;
   gap: 0.2rem;
+  overflow-wrap: break-word;
 }
 
 .report p {
-  word-break:normal;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .selectedReport {
@@ -258,8 +262,10 @@ tr {
 }
 
 .deadline-tag {
-  background-color: #ff3333; /* Red background */
-  color: #fff; /* White text */
+  background-color: #ff3333;
+  /* Red background */
+  color: #fff;
+  /* White text */
   padding: 2px 6px;
   border-radius: 4px;
   margin-left: 10px;
@@ -314,6 +320,7 @@ tr {
   th {
     transform: translateY(-5px);
   }
+
   tbody {
     transform: translateY(-5px);
     background-color: var(--dark-color) !important;

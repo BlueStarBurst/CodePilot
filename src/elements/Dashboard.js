@@ -347,7 +347,7 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{todo.map((br, i) => (
-							<React.Fragment key={i}>
+							<React.Fragment key={br.id}>
 								<FakeBugReport
 									col={0}
 									mouseCol={mouseCol}
@@ -386,7 +386,7 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{inProgress.map((br, i) => (
-							<React.Fragment key={i}>
+							<React.Fragment key={br.id}>
 								<FakeBugReport
 									col={1}
 									mouseCol={mouseCol}
@@ -425,7 +425,7 @@ export default function Dashboard(props) {
 					</TableHead>
 					<TableBody>
 						{completed.map((br, i) => (
-							<React.Fragment key={i}>
+							<React.Fragment key={br.id}>
 								<FakeBugReport
 									col={2}
 									mouseCol={mouseCol}
