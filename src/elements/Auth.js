@@ -70,8 +70,9 @@ export const Auth = (props) => {
 			isLoaded = true;
 		}
 		props.setAuthState(auth.currentUser);
-		console.log("auth state changed");
+		
 		auth.onAuthStateChanged((user) => {
+			console.log("auth state changed");
 			if (user) {
 				isSignedIn = true;
 				console.log("user signed in");
