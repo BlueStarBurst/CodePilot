@@ -9,6 +9,14 @@ import {
 	signInWithPopup,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
+import {
+	collection,
+	doc,
+	getDoc,
+	getFirestore,
+	setDoc,
+	updateDoc,
+} from "firebase/firestore";
 // import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -27,12 +35,13 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-// const db = getFirestore(app);
+const db = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
 var isLoaded = false;
 var isSignedIn = false;
+var currentUser = null;
 
 export async function signInWithGoogle() {
 	if (isLoaded && isSignedIn) {
@@ -62,6 +71,43 @@ export function logOut() {
 	auth.signOut();
 }
 
+export async function saveToFireStore(reports, todo, inprog, done) {
+	// save to users/{uid}/reports
+	// save to users/{uid}/todo
+	// save to users/{uid}/inprog
+	// save to users/{uid}/done
+
+	try {
+		const user = auth.currentUser;
+		const uid = user.uid;
+		const docRef = doc(db, "users", uid);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			console.log("Document data:", docSnap.data());
+			// save to users/{uid}/reports
+			updateDoc(docRef, {
+				reports: reports,
+				todo: todo,
+				inprog: inprog,
+				done: done,
+			});
+		} else {
+			// doc.data() will be undefined in this case
+			console.log("No such document!");
+
+			// create new doc
+			setDoc(doc(db, "users", uid), {
+				reports: reports,
+				todo: todo,
+				inprog: inprog,
+				done: done,
+			});
+		}
+	} catch (e) {
+		console.log(e);
+	}
+}
+
 //on auth state change
 
 export const Auth = (props) => {
@@ -70,10 +116,11 @@ export const Auth = (props) => {
 			isLoaded = true;
 		}
 		props.setAuthState(auth.currentUser);
-		
+
 		auth.onAuthStateChanged((user) => {
 			console.log("auth state changed");
 			if (user) {
+				currentUser = user;
 				isSignedIn = true;
 				console.log("user signed in");
 			} else {

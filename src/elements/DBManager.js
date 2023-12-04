@@ -1,5 +1,5 @@
-import { collection, getFirestore } from "firebase/firestore";
-import { db } from "./Auth";
+import { Firestore, collection, getFirestore } from "firebase/firestore";
+import { db, saveToFireStore } from "./Auth";
 
 import { BugReportData } from "./BugReport";
 
@@ -88,6 +88,9 @@ class DBManager {
 		this.saveToStorage("inprog", this.inprog);
 		this.saveToStorage("done", this.done);
 		this.saveToStorage("reports", this.reports);
+
+		// save to firestore
+		saveToFireStore(this.reports, this.todo, this.inprog, this.done);
 	}
 
 	createDB() {
@@ -224,6 +227,7 @@ class DBManager {
 			return this.getFromStorage("profile");
 		}
 	}
+
 
 
 }
