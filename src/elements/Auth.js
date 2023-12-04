@@ -86,10 +86,10 @@ export async function saveToFireStore(reports, todo, inprog, done) {
 			console.log("Document data:", docSnap.data());
 			// save to users/{uid}/reports
 			updateDoc(docRef, {
-				reports: reports,
-				todo: todo,
-				inprog: inprog,
-				done: done,
+				reports: JSON.stringify(reports),
+				todo: JSON.stringify(todo),
+				inprog: JSON.stringify(inprog),
+				done: JSON.stringify(done),
 			});
 		} else {
 			// doc.data() will be undefined in this case
@@ -97,10 +97,10 @@ export async function saveToFireStore(reports, todo, inprog, done) {
 
 			// create new doc
 			setDoc(doc(db, "users", uid), {
-				reports: reports,
-				todo: todo,
-				inprog: inprog,
-				done: done,
+				reports: JSON.stringify(reports),
+				todo: JSON.stringify(todo),
+				inprog: JSON.stringify(inprog),
+				done: JSON.stringify(done),
 			});
 		}
 	} catch (e) {
